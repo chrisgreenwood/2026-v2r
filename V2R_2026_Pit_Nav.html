@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>V2R Pit Nav — #888 Chase</title>
@@ -113,300 +114,112 @@
   th { color:#8a94a6; font-size:0.68rem; text-transform:uppercase; }
   .footer-note { text-align:center; color:#555; font-size:0.68rem; padding:24px 12px 0; }
 </style>
+
+<style>
+  #v2rGate {
+    position:fixed; inset:0; background:#0b1a33; z-index:9999;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  #v2rGate .box { max-width:340px; width:100%; text-align:center; }
+  #v2rGate h2 { color:#fff; font-size:1.1rem; margin-bottom:6px; }
+  #v2rGate p { color:#9fb3d9; font-size:0.85rem; margin-bottom:18px; }
+  #v2rGate input {
+    width:100%; padding:14px; border-radius:10px; border:1px solid #2a3650;
+    background:#132446; color:#fff; font-size:1rem; margin-bottom:10px; text-align:center;
+    box-sizing:border-box;
+  }
+  #v2rGate button {
+    width:100%; padding:14px; border-radius:10px; border:none;
+    background:#1e5fff; color:#fff; font-size:1rem; font-weight:700;
+  }
+  #v2rGate .err { color:#ff8080; font-size:0.82rem; margin-top:10px; min-height:1em; }
+  #v2rContent { display:none; }
+</style>
 </head>
 <body>
 
-<header style="display:block;">
-  <div style="display:flex; justify-content:space-between; align-items:center;">
-    <span class="title">🚗 Pit Nav — #888 Chase</span>
+<div id="v2rGate">
+  <div class="box">
+    <h2>🔒 V2R 2026 — Private</h2>
+    <p>Enter the team password to continue</p>
+    <form id="v2rForm">
+      <input type="password" id="v2rPwInput" autocomplete="current-password" placeholder="Password" autofocus>
+      <button type="submit">Unlock</button>
+      <div class="err" id="v2rErr"></div>
+    </form>
   </div>
-  <div style="font-size:0.72rem; color:#9fb3d9; margin-top:2px;">F-150 Raptor (3.5L) · Stock Production Truck Full · Brad Lovell / Adam Lovell</div>
-</header>
-<div style="display:flex; gap:8px; padding:10px 12px; background:#132446; flex-wrap:wrap;">
-  <a href="V2R_2026_Race_Reference.html" style="flex:1 0 auto; min-width:110px; text-align:center; color:#dbe4f5; background:#1c3260; text-decoration:none; font-size:0.78rem; padding:9px 10px; border-radius:10px; font-weight:600;">📋 Full Reference</a>
-  <a href="V2R_2026_Race_Pace.html" style="flex:1 0 auto; min-width:110px; text-align:center; color:#dbe4f5; background:#1c3260; text-decoration:none; font-size:0.78rem; padding:9px 10px; border-radius:10px; font-weight:600;">📈 #888 Race Pace</a>
-  <a href="V2R_2026_Race_Pace_RR228.html" style="flex:1 0 auto; min-width:110px; text-align:center; color:#dbe4f5; background:#1c3260; text-decoration:none; font-size:0.78rem; padding:9px 10px; border-radius:10px; font-weight:600;">🏎️ RR228 Pace</a>
 </div>
 
-<main>
-
-  <div class="progress" id="progressLabel">Leg — of —</div>
-
-  <div class="legcard">
-    <div class="fromto" id="fromLabel">From</div>
-    <h2 id="toLabel">To</h2>
-
-    <div class="biggrid">
-      <div class="bignum"><div class="val" id="distVal">—</div><div class="lab">Miles</div></div>
-      <div class="bignum"><div class="val" id="etaVal">—</div><div class="lab">Target ETA</div></div>
-    </div>
-
-    <a class="gobtn" id="mapsBtn" href="#" target="_blank">📍 Navigate in Google Maps</a>
-    <a class="gobtn secondary" id="destBtn" href="#" target="_blank">Drop pin at destination only</a>
-
-    <div class="turnnote" id="turnNoteBox" style="display:none;">
-      <div class="lab">Approach note</div>
-      <div id="turnNoteText"></div>
-    </div>
-
-    <div class="flagnote" id="flagBox" style="display:none;" id="flagBoxText"></div>
-
-    <div class="flagnote" id="fuelBox" style="display:none; background:#12331c; border-left-color:#2ecc71; color:#a8f0bf;">⛽ Expected fuel stop at this pit</div>
-
-    <div class="turnnote" style="border-left-color:#1e5fff;">
-      <div class="lab" style="color:#1e5fff;">Actual arrival at destination</div>
-      <input type="time" id="actualInput" style="width:100%; padding:10px; border-radius:8px; border:1px solid #2a3650; background:#0b1220; color:#fff; font-size:1rem;" onchange="saveActual(this.value)">
-      <div id="liveEtaDisplay" style="margin-top:8px; font-size:0.85rem; color:#9fb3d9;"></div>
-    </div>
-  </div>
-
-  <div class="navrow">
-    <button id="prevBtn" onclick="goPrev()">← Prev leg</button>
-    <button id="nextBtn" onclick="goNext()">Next leg →</button>
-  </div>
-
-  <details>
-    <summary>Jump to any leg</summary>
-    <div class="jumplist" id="jumpList"></div>
-  </details>
-
-  <div class="contacts">
-    <h3>Quick Call — Chase &amp; Fuel</h3>
-    <div class="contactrow">
-      <div><div class="name">Brad Lovell</div><div class="role">Driver</div></div>
-      <a class="tel" href="tel:7196497494">Call</a>
-    </div>
-    <div class="contactrow">
-      <div><div class="name">Adam Lovell</div><div class="role">Nav</div></div>
-      <a class="tel" href="tel:7196492748">Call</a>
-    </div>
-    <div class="contactrow">
-      <div><div class="name">Dan Huseman</div><div class="role">Lovell Chase 1</div></div>
-      <a class="tel" href="tel:9512830048">Call</a>
-    </div>
-    <div class="contactrow">
-      <div><div class="name">Robbie Huseman</div><div class="role">Lovell Chase 1</div></div>
-      <a class="tel" href="tel:9518409464">Call</a>
-    </div>
-    <div class="contactrow">
-      <div><div class="name">Randall Huseman</div><div class="role">Fuel Chase 2</div></div>
-      <a class="tel" href="tel:9519015932">Call</a>
-    </div>
-    <div class="contactrow">
-      <div><div class="name">Jason Hutter</div><div class="role">Fuel Chase 2</div></div>
-      <a class="tel" href="tel:9702740469">Call</a>
-    </div>
-    <div class="contactrow">
-      <div><div class="name">Paul Blangsted</div><div class="role">Fuel Chase 2</div></div>
-      <a class="tel" href="tel:9702740304">Call</a>
-    </div>
-    <div class="contactrow">
-      <div><div class="name">Kevin Huseman</div><div class="role">Raptor Light Chase</div></div>
-      <a class="tel" href="tel:9512837272">Call</a>
-    </div>
-    <div class="contactrow">
-      <div><div class="name">Jon Clark</div><div class="role">F150 Raptor data</div></div>
-      <a class="tel" href="tel:9133143810">Call</a>
-    </div>
-  </div>
-
-  <div class="closingcard">
-    <h3>Pit Closing Times (Car/Truck/UTV — Fri 8/14)</h3>
-    <table>
-      <tr><th>Pit</th><th>Closes</th></tr>
-      <tr><td>1 Weeks</td><td>2:51 PM</td></tr>
-      <tr><td>2 Top Gun</td><td>3:46 PM</td></tr>
-      <tr><td>3 Rawhide</td><td>4:53 PM</td></tr>
-      <tr><td>4 Gabbs</td><td>5:41 PM</td></tr>
-      <tr><td>5 Mina</td><td>7:01 PM</td></tr>
-      <tr><td>6 Coaldale</td><td>8:40 PM</td></tr>
-      <tr><td>7 Tonopah</td><td>10:26 PM</td></tr>
-      <tr><td>8 Cottontail</td><td>12:14 AM</td></tr>
-      <tr><td>9 Bonnie Claire</td><td>1:36 AM</td></tr>
-      <tr><td>10 Omni Station</td><td>2:57 AM</td></tr>
-      <tr><td>11 Amargosa Valley</td><td>4:24 AM</td></tr>
-      <tr><td><strong>Finish Crystal</strong></td><td><strong>5:12 AM</strong></td></tr>
-    </table>
-    <p style="font-size:0.72rem; color:#8a94a6; margin-top:8px;">Pit crew speed limit: 25 MPH entering/inside/exiting every pit. No overnight camping. Move-out immediately after race.</p>
-  </div>
-
-</main>
-
-<div class="footer-note">V2R 2026 · Chase road routing (LeadNav GPX) + #888 ETA chart · Aug 12, 2026</div>
+<div id="v2rContent"></div>
 
 <script>
-const DEST_KEYS = ['start','p1','p2','p3','p4','p5','p6','p7','p8','p9','p10','p11','finish'];
-const DEST_MI   = [0,45,75,110,135,175,230,285,345,390,430,477,502];
-const DEST_PLAN = ['12:30 PM','1:32 PM','2:10 PM','2:58 PM','3:31 PM','4:25 PM','5:28 PM','6:34 PM','7:42 PM','8:40 PM','9:28 PM','10:38 PM','11:05 PM'];
+const V2R_SALT = "lWdCCmS1Uj/hz5MWw1GH9w==";
+const V2R_IV = "7sRz0bnyGoSEkDqT";
+const V2R_CT = "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";
+const V2R_STORAGE_KEY = "v2rSitePassword";
 
-const legs = [
-  { from:"J Resort", to:"Start (Dayton, NV)", dist:"42.8", eta:"12:15 PM",
-    saddr:"39.5282,-119.81861", daddr:"39.22924,-119.57766",
-    note:"Leave start line ~15 min before race car. Get fuel leaving Reno." },
-  { from:"Start (Dayton, NV)", to:"Pit 1 – Weeks", dist:"31.0", eta:"12:49 PM",
-    saddr:"39.22924,-119.57766", daddr:"39.28237,-119.23054",
-    note:"Pit 1 Weeks is just south of Carson River near \u2018Scout Camp at Fort Churchill\u2019." },
-  { from:"Pit 1 – Weeks", to:"Pit 2 – Top Gun", dist:"51.5", eta:"2:09 PM",
-    saddr:"39.28237,-119.23054", daddr:"39.25993,-118.76369",
-    note:"Pit 2 Top Gun is near \u2018Top Gun Raceway\u2019." },
-  { from:"Pit 2 – Top Gun", to:"Pit 3 – Rawhide", dist:"60.4", eta:"2:58 PM",
-    saddr:"39.25993,-118.76369", daddr:"38.96932,-118.34411",
-    note:"1 hr from 95 / Alt 95 junction (38.968917, -118.343878).",
-    flag:"⚠️ No scheduled support at Pit 3 Rawhide — emergency only." },
-  { from:"Pit 3 – Rawhide", to:"Pit 4 – Gabbs", dist:"69.2", eta:"3:31 PM",
-    saddr:"38.96932,-118.34411", daddr:"38.8703,-117.92299",
-    note:"Pit 4 Gabbs is a town." },
-  { from:"Pit 4 – Gabbs", to:"Pit 5 – Mina", dist:"42.4", eta:"4:25 PM",
-    saddr:"38.8703,-117.92299", daddr:"38.42102,-118.08792",
-    note:"Turn NE on Simon Lead Rd just before the town of Mina.",
-    fuel:true },
-  { from:"Pit 5 – Mina", to:"Pit 6 – Coaldale", dist:"32.6", eta:"5:28 PM",
-    saddr:"38.42102,-118.08792", daddr:"38.03006,-117.89209",
-    note:"Turn west on Hwy 6 at Coaldale Junction. ~0.5 mi off the highway." },
-  { from:"Pit 6 – Coaldale", to:"Pit 7 – Tonopah", dist:"45.2", eta:"6:34 PM",
-    saddr:"38.03006,-117.89209", daddr:"38.02655,-117.25727",
-    note:"Turn west on dirt road 2.4 mi past the Texaco station. Follow dirt road 1 mi." },
-  { from:"Pit 7 – Tonopah", to:"Pit 8 – Cottontail", dist:"39.6", eta:"7:42 PM",
-    saddr:"38.0264,-117.25716", daddr:"37.49879,-117.1844",
-    note:"At Hwy 95 / 266 junction, west side of highway. Hard to miss.",
-    fuel:true },
-  { from:"Pit 8 – Cottontail", to:"Pit 9 – Bonnie Claire", dist:"23.1", eta:"8:40 PM",
-    saddr:"37.49879,-117.1844", daddr:"37.22625,-117.12766",
-    note:"Search for \u2018Bonnie Claire\u2019 turn on Scotty\u2019s Castle Rd off Hwy 95." },
-  { from:"Pit 9 – Bonnie Claire", to:"Pit 10 – Omni Station", dist:"50.7", eta:"9:28 PM",
-    saddr:"37.22625,-117.12766", daddr:"36.80416,-116.74784",
-    note:"~5 mi south of Beatty. 0.5 mi off west side of highway on dirt road, visible from Hwy 95." },
-  { from:"Pit 10 – Omni Station", to:"Pit 11 – Amargosa Valley", dist:"24.0", eta:"10:38 PM",
-    saddr:"36.80416,-116.74784", daddr:"36.63432,-116.41311",
-    note:"Small town at Hwy 373 junction. Pit is ~0.5 mi off highway, NW corner." },
-  { from:"Pit 11 – Amargosa Valley", to:"Finish (Crystal, NV)", dist:"26.3", eta:"11:05 PM",
-    saddr:"36.63432,-116.41311", daddr:"36.49083,-116.15524",
-    note:"From Hwy 95, turn right on Hwy 160, then right again in ~5 mi." },
-];
-
-let idx = parseInt(localStorage.getItem('v2rPitNavLeg') || '0', 10);
-if (isNaN(idx) || idx < 0 || idx >= legs.length) idx = 0;
-
-function parseClockToMinutes(str){
-  const m = str.trim().match(/(\d+):(\d+)\s*(AM|PM)/i);
-  if(!m) return null;
-  let h = parseInt(m[1],10) % 12;
-  if(/PM/i.test(m[3])) h += 12;
-  return h*60 + parseInt(m[2],10);
-}
-function parseTimeInputToMinutes(hhmm){
-  const [h,m] = hhmm.split(':').map(Number);
-  return h*60+m;
-}
-function rollForward(mins, floor){
-  let v = mins;
-  while(v < floor) v += 1440;
-  return v;
-}
-function formatAbsMinutes(abs){
-  abs = Math.round(abs);
-  const dayOffset = Math.floor(abs/1440);
-  const m = ((abs%1440)+1440)%1440;
-  let h = Math.floor(m/60), mm = m%60;
-  const ampm = h>=12 ? 'PM':'AM';
-  let h12 = h%12; if(h12===0) h12=12;
-  return `${h12}:${String(mm).padStart(2,'0')} ${ampm}${dayOffset>0 ? ' (+1d)':''}`;
-}
-function getActuals(){
-  try{ return JSON.parse(localStorage.getItem('v2rActualTimes')||'{}'); } catch(e){ return {}; }
-}
-function saveActual(val){
-  const key = DEST_KEYS[idx];
-  const a = getActuals();
-  if(val) a[key]=val; else delete a[key];
-  localStorage.setItem('v2rActualTimes', JSON.stringify(a));
-  render();
-}
-function computeLiveEta(){
-  const actuals = getActuals();
-  let planAbs = [], prevPlan = null;
-  DEST_PLAN.forEach((t)=>{
-    let raw = parseClockToMinutes(t);
-    let abs = prevPlan===null ? raw : rollForward(raw, prevPlan);
-    planAbs.push(abs); prevPlan = abs;
-  });
-  let anchorAbs=null, anchorMi=0, pace=null, anchorIdx=-1;
-  const results = DEST_KEYS.map((key,i)=>{
-    const actualStr = actuals[key] || '';
-    let liveAbs, isActual=false;
-    if(i===0){
-      liveAbs = actualStr ? parseTimeInputToMinutes(actualStr) : planAbs[0];
-      isActual = !!actualStr;
-      anchorAbs = liveAbs; anchorMi = DEST_MI[0]; anchorIdx = 0;
-    } else {
-      const distFromAnchor = DEST_MI[i] - anchorMi;
-      if(actualStr){
-        let raw = parseTimeInputToMinutes(actualStr);
-        liveAbs = rollForward(raw, anchorAbs);
-        isActual = true;
-        const hrs = (liveAbs-anchorAbs)/60;
-        pace = hrs>0 ? (distFromAnchor/hrs) : pace;
-        anchorAbs = liveAbs; anchorMi = DEST_MI[i]; anchorIdx = i;
-      } else {
-        liveAbs = pace ? (anchorAbs + (distFromAnchor/pace)*60)
-                       : (anchorAbs + (planAbs[i]-planAbs[anchorIdx]));
-      }
-    }
-    return { key, liveAbs, isActual };
-  });
-  return { results, pace };
+function b64ToBytes(b64) {
+  return Uint8Array.from(atob(b64), c => c.charCodeAt(0));
 }
 
-function render(){
-  const leg = legs[idx];
-  document.getElementById('progressLabel').textContent = `Leg ${idx+1} of ${legs.length}`;
-  document.getElementById('fromLabel').textContent = `From ${leg.from}`;
-  document.getElementById('toLabel').textContent = leg.to;
-  document.getElementById('distVal').textContent = leg.dist;
-  document.getElementById('etaVal').textContent = leg.eta;
-  document.getElementById('mapsBtn').href = `https://www.google.com/maps/dir/?api=1&origin=${leg.saddr}&destination=${leg.daddr}&travelmode=driving`;
-  document.getElementById('destBtn').href = `https://www.google.com/maps/search/?api=1&query=${leg.daddr}`;
+async function v2rDeriveKey(password, saltB64) {
+  const enc = new TextEncoder();
+  const salt = b64ToBytes(saltB64);
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['decrypt']
+  );
+}
 
-  const noteBox = document.getElementById('turnNoteBox');
-  if (leg.note) { noteBox.style.display='block'; document.getElementById('turnNoteText').textContent = leg.note; }
-  else { noteBox.style.display='none'; }
-
-  const flagBox = document.getElementById('flagBox');
-  if (leg.flag) { flagBox.style.display='block'; flagBox.textContent = leg.flag; }
-  else { flagBox.style.display='none'; }
-
-  const fuelBox = document.getElementById('fuelBox');
-  fuelBox.style.display = leg.fuel ? 'block' : 'none';
-
-  const actuals = getActuals();
-  const destKey = DEST_KEYS[idx];
-  document.getElementById('actualInput').value = actuals[destKey] || '';
-
-  const { results, pace } = computeLiveEta();
-  const thisResult = results[idx];
-  const liveDisp = document.getElementById('liveEtaDisplay');
-  if (thisResult.isActual) {
-    liveDisp.innerHTML = `✅ Arrived ${formatAbsMinutes(thisResult.liveAbs)}`;
-  } else if (pace) {
-    liveDisp.innerHTML = `Live ETA ${formatAbsMinutes(thisResult.liveAbs)} <span style="color:#8a94a6;">(running ${Math.round(pace)} mph)</span>`;
-  } else {
-    liveDisp.innerHTML = `Live ETA ${formatAbsMinutes(thisResult.liveAbs)} <span style="color:#8a94a6;">(no actuals yet — plan pace)</span>`;
+async function v2rTryUnlock(password) {
+  try {
+    const key = await v2rDeriveKey(password, V2R_SALT);
+    const iv = b64ToBytes(V2R_IV);
+    const ct = b64ToBytes(V2R_CT);
+    const plainBuf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ct);
+    const html = new TextDecoder().decode(plainBuf);
+    const contentDiv = document.getElementById('v2rContent');
+    contentDiv.innerHTML = html;
+    // re-execute any script tags in the injected content (innerHTML doesn't run them)
+    contentDiv.querySelectorAll('script').forEach(oldScript => {
+      const newScript = document.createElement('script');
+      if (oldScript.src) { newScript.src = oldScript.src; }
+      else { newScript.textContent = oldScript.textContent; }
+      document.body.appendChild(newScript);
+    });
+    document.getElementById('v2rGate').style.display = 'none';
+    contentDiv.style.display = 'block';
+    localStorage.setItem(V2R_STORAGE_KEY, password);
+    return true;
+  } catch (e) {
+    return false;
   }
-
-  document.getElementById('prevBtn').disabled = (idx === 0);
-  document.getElementById('nextBtn').disabled = (idx === legs.length - 1);
-
-  const jl = document.getElementById('jumpList');
-  jl.innerHTML = legs.map((l,i)=>
-    `<button class="${i===idx?'active':''}" onclick="jumpTo(${i})">${i+1}. ${l.from} → ${l.to}${l.fuel?' ⛽':''} <span style="color:#8a94a6;">(${l.dist} mi, ETA ${l.eta})</span></button>`
-  ).join('');
-
-  localStorage.setItem('v2rPitNavLeg', idx);
 }
-function goPrev(){ if(idx>0){ idx--; render(); } }
-function goNext(){ if(idx<legs.length-1){ idx++; render(); } }
-function jumpTo(i){ idx=i; render(); }
-render();
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const saved = localStorage.getItem(V2R_STORAGE_KEY);
+  if (saved) {
+    const ok = await v2rTryUnlock(saved);
+    if (!ok) localStorage.removeItem(V2R_STORAGE_KEY);
+  }
+  document.getElementById('v2rForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const pw = document.getElementById('v2rPwInput').value;
+    const ok = await v2rTryUnlock(pw);
+    if (!ok) {
+      document.getElementById('v2rErr').textContent = 'Incorrect password — try again.';
+      document.getElementById('v2rPwInput').value = '';
+      document.getElementById('v2rPwInput').focus();
+    }
+  });
+});
 </script>
 
 </body>

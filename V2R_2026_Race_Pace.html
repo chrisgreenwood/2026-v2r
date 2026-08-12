@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>V2R Race Pace — #888 Chase ETA</title>
@@ -61,176 +62,112 @@
   button.secondary { background:#e8edf7; color:#0b1a33; }
   .footer-note { text-align:center; color:#999; font-size:0.7rem; padding:20px 12px 0;}
 </style>
+
+<style>
+  #v2rGate {
+    position:fixed; inset:0; background:#0b1a33; z-index:9999;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  #v2rGate .box { max-width:340px; width:100%; text-align:center; }
+  #v2rGate h2 { color:#fff; font-size:1.1rem; margin-bottom:6px; }
+  #v2rGate p { color:#9fb3d9; font-size:0.85rem; margin-bottom:18px; }
+  #v2rGate input {
+    width:100%; padding:14px; border-radius:10px; border:1px solid #2a3650;
+    background:#132446; color:#fff; font-size:1rem; margin-bottom:10px; text-align:center;
+    box-sizing:border-box;
+  }
+  #v2rGate button {
+    width:100%; padding:14px; border-radius:10px; border:none;
+    background:#1e5fff; color:#fff; font-size:1rem; font-weight:700;
+  }
+  #v2rGate .err { color:#ff8080; font-size:0.82rem; margin-top:10px; min-height:1em; }
+  #v2rContent { display:none; }
+</style>
 </head>
 <body>
 
-<div class="stickytop">
-<header>
-  <div class="badge-row"><span class="stkbadge">🏁 Stock Production Truck Full</span></div>
-  <h1>Race Pace — #888 Chase ETA</h1>
-  <div class="sub">F-150 Raptor (3.5L) · Lovell Off-Road · Brad Lovell / Adam Lovell (nav)</div>
-</header>
-<div class="backrow">
-  <a href="V2R_2026_Race_Reference.html">📋 Full Reference</a>
-  <a href="V2R_2026_Pit_Nav.html">🚗 Pit Nav</a>
-  <a href="V2R_2026_Race_Pace_RR228.html">🏎️ RR228 Pace</a>
-</div>
-</div>
-
-<main>
-
-<section id="eta">
-  <h2>#888 Chase ETA Chart (Command Chase / Blue F250)</h2>
-  <div class="card">
-    <div class="statsrow" id="etaStatsRow">
-      <div class="stat"><div class="num" id="statStart">12:30</div><div class="lab">Start</div></div>
-      <div class="stat"><div class="num" id="statFinish">~11:05</div><div class="lab">Proj. Finish</div></div>
-      <div class="stat"><div class="num" id="statPace">—</div><div class="lab">Current Pace</div></div>
-    </div>
-    <table id="etaTable">
-      <tr><th>Pit</th><th>RM</th><th>Sec. mi</th><th>Plan ETA</th><th>Actual</th><th>Live ETA</th></tr>
-    </table>
-    <button class="secondary" onclick="resetEtaActuals()" style="margin-top:8px;">Reset actual times</button>
-    <p class="small">Enter the actual time you (or the crew) arrive at a pit — every ETA past that point recalculates using the pace of that most recent leg. This data is shared with the Pit Nav page (same device/browser) — entries made while driving carry over here automatically.</p>
-    <p class="small">Fuel cap 62 gal, est. 3 mpg, ~186mi range. Turn notes: <strong>Pit 5 Mina</strong> — turn NE on Simon Lead Rd just before town. <strong>Pit 6 Coaldale</strong> — turn west on Hwy 6 at Coaldale Junction, ~0.5mi off highway. <strong>Pit 7 Tonopah</strong> — turn west on dirt road 2.4mi past the Texaco station, follow 1mi. <strong>Pit 8 Cottontail</strong> — at Hwy 95/266 junction, west side, hard to miss. <strong>Pit 9 Bonnie Claire</strong> — turn on Scotty's Castle Rd off Hwy 95. <strong>Pit 10 Omni Station</strong> — ~5mi south of Beatty, 0.5mi off west side, visible from 95. <strong>Pit 11 Amargosa</strong> — small town at Hwy 373 junction, ~0.5mi off highway, NW corner. <strong>Finish</strong> — from 95, right on Hwy 160, then right again in ~5mi.</p>
-    <p class="small unconfirmed">A parallel ETA chart exists for the #773 Ranger Raptor chase route (RTR program, 50-gal tank, 3.3 mpg, ~165mi range) — same pit sequence, nearly identical timing, support is box truck + fuel truck + F450 backup rather than the Lovell chase fleet.</p>
+<div id="v2rGate">
+  <div class="box">
+    <h2>🔒 V2R 2026 — Private</h2>
+    <p>Enter the team password to continue</p>
+    <form id="v2rForm">
+      <input type="password" id="v2rPwInput" autocomplete="current-password" placeholder="Password" autofocus>
+      <button type="submit">Unlock</button>
+      <div class="err" id="v2rErr"></div>
+    </form>
   </div>
-</section>
+</div>
 
-</main>
-
-<div class="footer-note">V2R 2026 · #888 chase ETA chart · shares actual-time data with Pit Nav on this device</div>
+<div id="v2rContent"></div>
 
 <script>
-const ETA_POINTS = [
-  { key:'start',  label:'Start (Dayton)',        mi:0,   plan:'12:30 PM' },
-  { key:'p1',     label:'Pit 1 – Weeks',         mi:45,  plan:'1:32 PM',  flag:'' },
-  { key:'p2',     label:'Pit 2 – Top Gun',       mi:75,  plan:'2:10 PM' },
-  { key:'p3',     label:'Pit 3 – Rawhide',       mi:110, plan:'2:58 PM', flag:'no support — emergency only' },
-  { key:'p4',     label:'Pit 4 – Gabbs',         mi:135, plan:'3:31 PM' },
-  { key:'p5',     label:'Pit 5 – Mina',          mi:175, plan:'4:25 PM', fuel:true },
-  { key:'p6',     label:'Pit 6 – Coaldale',      mi:230, plan:'5:28 PM' },
-  { key:'p7',     label:'Pit 7 – Tonopah',       mi:285, plan:'6:34 PM' },
-  { key:'p8',     label:'Pit 8 – Cottontail',    mi:345, plan:'7:42 PM', fuel:true },
-  { key:'p9',     label:'Pit 9 – Bonnie Claire', mi:390, plan:'8:40 PM' },
-  { key:'p10',    label:'Pit 10 – Omni Station', mi:430, plan:'9:28 PM' },
-  { key:'p11',    label:'Pit 11 – Amargosa Valley', mi:477, plan:'10:38 PM' },
-  { key:'finish', label:'Finish (Crystal)',      mi:502, plan:'11:05 PM' },
-];
+const V2R_SALT = "HIgaBZyX9ftzKQlgkx17EQ==";
+const V2R_IV = "FZtp487Bfo2lIZAL";
+const V2R_CT = "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";
+const V2R_STORAGE_KEY = "v2rSitePassword";
 
-function parseClockToMinutes(str){
-  const m = str.trim().match(/(\d+):(\d+)\s*(AM|PM)/i);
-  if(!m) return null;
-  let h = parseInt(m[1],10) % 12;
-  if(/PM/i.test(m[3])) h += 12;
-  return h*60 + parseInt(m[2],10);
-}
-function parseTimeInputToMinutes(hhmm){
-  const [h,m] = hhmm.split(':').map(Number);
-  return h*60+m;
-}
-function rollForward(mins, floor){
-  let v = mins;
-  while(v < floor) v += 1440;
-  return v;
-}
-function formatAbsMinutes(abs){
-  abs = Math.round(abs);
-  const dayOffset = Math.floor(abs/1440);
-  const m = ((abs%1440)+1440)%1440;
-  let h = Math.floor(m/60), mm = m%60;
-  const ampm = h>=12 ? 'PM':'AM';
-  let h12 = h%12; if(h12===0) h12=12;
-  return `${h12}:${String(mm).padStart(2,'0')} ${ampm}${dayOffset>0 ? ' (+1d)':''}`;
+function b64ToBytes(b64) {
+  return Uint8Array.from(atob(b64), c => c.charCodeAt(0));
 }
 
-function getActuals(){
-  try{ return JSON.parse(localStorage.getItem('v2rActualTimes')||'{}'); } catch(e){ return {}; }
+async function v2rDeriveKey(password, saltB64) {
+  const enc = new TextEncoder();
+  const salt = b64ToBytes(saltB64);
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['decrypt']
+  );
 }
-function setActual(key, hhmm){
-  const a = getActuals();
-  if(hhmm) a[key]=hhmm; else delete a[key];
-  localStorage.setItem('v2rActualTimes', JSON.stringify(a));
-}
-function resetEtaActuals(){
-  if(confirm('Clear all actual arrival times?')){
-    localStorage.removeItem('v2rActualTimes');
-    renderEta();
+
+async function v2rTryUnlock(password) {
+  try {
+    const key = await v2rDeriveKey(password, V2R_SALT);
+    const iv = b64ToBytes(V2R_IV);
+    const ct = b64ToBytes(V2R_CT);
+    const plainBuf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ct);
+    const html = new TextDecoder().decode(plainBuf);
+    const contentDiv = document.getElementById('v2rContent');
+    contentDiv.innerHTML = html;
+    // re-execute any script tags in the injected content (innerHTML doesn't run them)
+    contentDiv.querySelectorAll('script').forEach(oldScript => {
+      const newScript = document.createElement('script');
+      if (oldScript.src) { newScript.src = oldScript.src; }
+      else { newScript.textContent = oldScript.textContent; }
+      document.body.appendChild(newScript);
+    });
+    document.getElementById('v2rGate').style.display = 'none';
+    contentDiv.style.display = 'block';
+    localStorage.setItem(V2R_STORAGE_KEY, password);
+    return true;
+  } catch (e) {
+    return false;
   }
 }
 
-function computeEta(){
-  const actuals = getActuals();
-  // precompute plan absolute minutes (monotonic, handles midnight rollover)
-  let planAbs = [];
-  let prevPlan = null;
-  ETA_POINTS.forEach((p,i)=>{
-    let raw = parseClockToMinutes(p.plan);
-    let abs = prevPlan===null ? raw : rollForward(raw, prevPlan);
-    planAbs.push(abs);
-    prevPlan = abs;
-  });
-
-  let anchorAbs = null, anchorMi = 0, pace = null, anchorIdx = -1;
-  const rows = ETA_POINTS.map((p,i)=>{
-    const actualStr = actuals[p.key] || '';
-    let liveAbs, isActual=false, legPace=null;
-
-    if(i===0){
-      if(actualStr){ liveAbs = parseTimeInputToMinutes(actualStr); isActual=true; }
-      else liveAbs = planAbs[0];
-      anchorAbs = liveAbs; anchorMi = p.mi; anchorIdx = 0;
-    } else {
-      const distFromAnchor = p.mi - anchorMi;
-      if(actualStr){
-        let raw = parseTimeInputToMinutes(actualStr);
-        liveAbs = rollForward(raw, anchorAbs);
-        isActual = true;
-        const hrs = (liveAbs - anchorAbs)/60;
-        legPace = hrs>0 ? (distFromAnchor/hrs) : null;
-        anchorAbs = liveAbs; anchorMi = p.mi; pace = legPace; anchorIdx = i;
-      } else {
-        if(pace){
-          liveAbs = anchorAbs + (distFromAnchor/pace)*60;
-        } else {
-          // no actual pace established yet — carry forward plan's offset from the anchor point
-          liveAbs = anchorAbs + (planAbs[i] - planAbs[anchorIdx]);
-        }
-      }
+window.addEventListener('DOMContentLoaded', async () => {
+  const saved = localStorage.getItem(V2R_STORAGE_KEY);
+  if (saved) {
+    const ok = await v2rTryUnlock(saved);
+    if (!ok) localStorage.removeItem(V2R_STORAGE_KEY);
+  }
+  document.getElementById('v2rForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const pw = document.getElementById('v2rPwInput').value;
+    const ok = await v2rTryUnlock(pw);
+    if (!ok) {
+      document.getElementById('v2rErr').textContent = 'Incorrect password — try again.';
+      document.getElementById('v2rPwInput').value = '';
+      document.getElementById('v2rPwInput').focus();
     }
-    return { p, isActual, liveAbs, legPace };
   });
-  return { rows, finalPace: pace };
-}
-
-function renderEta(){
-  const { rows, finalPace } = computeEta();
-  const table = document.getElementById('etaTable');
-  table.innerHTML = '<tr><th>Pit</th><th>RM</th><th>Sec. mi</th><th>Plan ETA</th><th>Actual</th><th>Live ETA</th></tr>' +
-    rows.map((r,i)=>{
-      const p = r.p;
-      const prevMi = i===0 ? 0 : rows[i-1].p.mi;
-      const secMi = i===0 ? '—' : (p.mi - prevMi);
-      const flagHtml = p.flag ? ` <span class="pill unconfirmed">${p.flag}</span>` : '';
-      const fuelHtml = p.fuel ? ` <span class="pill fuel">⛽ Fuel stop</span>` : '';
-      const rowStyle = p.fuel ? ' style="background:#eaf6ec;"' : '';
-      const liveStr = formatAbsMinutes(r.liveAbs);
-      const liveCellStyle = r.isActual ? 'font-weight:800; color:#146c2e;' : '';
-      return `<tr${rowStyle}>
-        <td>${p.label}${flagHtml}${fuelHtml}</td>
-        <td>${p.mi}</td>
-        <td>${secMi}</td>
-        <td>${p.plan}</td>
-        <td><input type="time" value="${localStorage.getItem('v2rActualTimes') ? (JSON.parse(localStorage.getItem('v2rActualTimes'))[p.key]||'') : ''}" style="width:110px; padding:4px;" onchange="setActual('${p.key}', this.value); renderEta();"></td>
-        <td style="${liveCellStyle}">${liveStr}${r.isActual?' ✓':''}</td>
-      </tr>`;
-    }).join('');
-
-  document.getElementById('statStart').textContent = formatAbsMinutes(rows[0].liveAbs).split(' ')[0];
-  document.getElementById('statFinish').textContent = formatAbsMinutes(rows[rows.length-1].liveAbs).split(' ')[0];
-  document.getElementById('statPace').textContent = finalPace ? Math.round(finalPace)+' mph' : '—';
-}
-renderEta();
+});
 </script>
 
 </body>

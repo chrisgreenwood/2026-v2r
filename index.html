@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>V2R 2026 — Lovell #888</title>
@@ -23,21 +24,113 @@
   a.card.pitnav { background:#1e5fff; border-color:#1e5fff; }
   a.card.pitnav .desc { color:#cfe0ff; }
 </style>
+
+<style>
+  #v2rGate {
+    position:fixed; inset:0; background:#0b1a33; z-index:9999;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  #v2rGate .box { max-width:340px; width:100%; text-align:center; }
+  #v2rGate h2 { color:#fff; font-size:1.1rem; margin-bottom:6px; }
+  #v2rGate p { color:#9fb3d9; font-size:0.85rem; margin-bottom:18px; }
+  #v2rGate input {
+    width:100%; padding:14px; border-radius:10px; border:1px solid #2a3650;
+    background:#132446; color:#fff; font-size:1rem; margin-bottom:10px; text-align:center;
+    box-sizing:border-box;
+  }
+  #v2rGate button {
+    width:100%; padding:14px; border-radius:10px; border:none;
+    background:#1e5fff; color:#fff; font-size:1rem; font-weight:700;
+  }
+  #v2rGate .err { color:#ff8080; font-size:0.82rem; margin-top:10px; min-height:1em; }
+  #v2rContent { display:none; }
+</style>
 </head>
 <body>
-<main>
-  <h1>Vegas to Reno 2026</h1>
-  <div class="sub">Lovell Off-Road #888 · Chris Greenwood — Command Chase Driver</div>
 
-  <a class="card pitnav" href="V2R_2026_Pit_Nav.html">
-    <div class="name">🚗 Pit Nav — Quick Reference</div>
-    <div class="desc">Leg-by-leg chase directions, ETAs &amp; contacts for driving</div>
-  </a>
+<div id="v2rGate">
+  <div class="box">
+    <h2>🔒 V2R 2026 — Private</h2>
+    <p>Enter the team password to continue</p>
+    <form id="v2rForm">
+      <input type="password" id="v2rPwInput" autocomplete="current-password" placeholder="Password" autofocus>
+      <button type="submit">Unlock</button>
+      <div class="err" id="v2rErr"></div>
+    </form>
+  </div>
+</div>
 
-  <a class="card" href="V2R_2026_Race_Reference.html">
-    <div class="name">📋 Full Race Reference</div>
-    <div class="desc">Schedule, roster, hotels, course GPS, pace log</div>
-  </a>
-</main>
+<div id="v2rContent"></div>
+
+<script>
+const V2R_SALT = "FORKmWrBCJtQv9Cz5O80Dg==";
+const V2R_IV = "0uis0581zYZ0sKSw";
+const V2R_CT = "5+1x2oRhKnr/LmGJadmOvovXaWbn9nlEziTldGFYBxvRLITX2NJifapw3ibcDhn8/XZXyWVQCbleAEAqy0RyImUkwLKRmgQE4IImOleTqc5gHyplyeW8T1p1iF87mfcvDKXlg9sRj/JQruy43jCLdRXlFgiGvYaADZCIaroNWBe9cSLJ0OI1RYKvoHn9HJoCnCHklWGGtFiFkdbSi3r5WJh+Cow+dp1GOy7Ejao6W0HcREei1/sgWyRL9WMOPeM0ctNiItNzkGpkoQI0qgMjlc0RRUn/3gV0HK8WZuEVAOL6xVoiyCorBNe5puyen2pEVVMTl46/I7BhrgVruOV3gd0frD3FJ2OjjyaUOAz9PPsLJetk64tO0lhAPBCBwrBqs+Rne91FAEn0hdKlylRaqblanFGlXPhZC+NPWh3wpHcINF/vuoI0VsncdOkMIm9hGgGUT/SwlBu9ele20HdOZH4rfWP7EFQtM3UL544EfCYpgb519XgUdqFrukQyPvfk7rLltkf242J5yjz+9rGiGx0pjHu6arrQrJG5AtiGT2nUmkg0B1zp00719k5TwxBIUzH/+arnLjuzikFoSrwNzHGwtQp7idUlOEQOZUfnilTeFk9UoP/oegUhNAXhlsjKwIzscrR0HsvQY1MeXrS+0oUHvt7PJBQtsTqdfv5XFh2Hhbyk8Cdza03J53AgWYp4aNKsZFeA9lW2afvga32L0cf6gIu+uE8q2LdP3g==";
+const V2R_STORAGE_KEY = "v2rSitePassword";
+
+function b64ToBytes(b64) {
+  return Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+}
+
+async function v2rDeriveKey(password, saltB64) {
+  const enc = new TextEncoder();
+  const salt = b64ToBytes(saltB64);
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['decrypt']
+  );
+}
+
+async function v2rTryUnlock(password) {
+  try {
+    const key = await v2rDeriveKey(password, V2R_SALT);
+    const iv = b64ToBytes(V2R_IV);
+    const ct = b64ToBytes(V2R_CT);
+    const plainBuf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ct);
+    const html = new TextDecoder().decode(plainBuf);
+    const contentDiv = document.getElementById('v2rContent');
+    contentDiv.innerHTML = html;
+    // re-execute any script tags in the injected content (innerHTML doesn't run them)
+    contentDiv.querySelectorAll('script').forEach(oldScript => {
+      const newScript = document.createElement('script');
+      if (oldScript.src) { newScript.src = oldScript.src; }
+      else { newScript.textContent = oldScript.textContent; }
+      document.body.appendChild(newScript);
+    });
+    document.getElementById('v2rGate').style.display = 'none';
+    contentDiv.style.display = 'block';
+    localStorage.setItem(V2R_STORAGE_KEY, password);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const saved = localStorage.getItem(V2R_STORAGE_KEY);
+  if (saved) {
+    const ok = await v2rTryUnlock(saved);
+    if (!ok) localStorage.removeItem(V2R_STORAGE_KEY);
+  }
+  document.getElementById('v2rForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const pw = document.getElementById('v2rPwInput').value;
+    const ok = await v2rTryUnlock(pw);
+    if (!ok) {
+      document.getElementById('v2rErr').textContent = 'Incorrect password — try again.';
+      document.getElementById('v2rPwInput').value = '';
+      document.getElementById('v2rPwInput').focus();
+    }
+  });
+});
+</script>
+
 </body>
 </html>

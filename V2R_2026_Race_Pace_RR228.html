@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>V2R Race Pace — RR228 T1+ Raptor</title>
@@ -68,164 +69,112 @@
   button.secondary { background:#f3ece3; color:#161311; }
   .footer-note { text-align:center; color:#999; font-size:0.7rem; padding:20px 12px 0;}
 </style>
+
+<style>
+  #v2rGate {
+    position:fixed; inset:0; background:#0b1a33; z-index:9999;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  #v2rGate .box { max-width:340px; width:100%; text-align:center; }
+  #v2rGate h2 { color:#fff; font-size:1.1rem; margin-bottom:6px; }
+  #v2rGate p { color:#9fb3d9; font-size:0.85rem; margin-bottom:18px; }
+  #v2rGate input {
+    width:100%; padding:14px; border-radius:10px; border:1px solid #2a3650;
+    background:#132446; color:#fff; font-size:1rem; margin-bottom:10px; text-align:center;
+    box-sizing:border-box;
+  }
+  #v2rGate button {
+    width:100%; padding:14px; border-radius:10px; border:none;
+    background:#1e5fff; color:#fff; font-size:1rem; font-weight:700;
+  }
+  #v2rGate .err { color:#ff8080; font-size:0.82rem; margin-top:10px; min-height:1em; }
+  #v2rContent { display:none; }
+</style>
 </head>
 <body>
 
-<div class="stickytop">
-<header>
-  <div class="badge-row"><span class="rrbadge">🏎️ Rally Raid</span></div>
-  <h1>Race Pace — RR228 T1+ Raptor</h1>
-  <div class="sub">Rally Raid 4WD · Mitch Guthrie Jr. / Kellon Walch</div>
-</header>
-<div class="stripes"></div>
-<div class="backrow">
-  <a href="V2R_2026_Race_Reference.html">📋 Full Reference</a>
-  <a href="V2R_2026_Race_Pace.html">🏁 #888 Race Pace</a>
-  <a href="V2R_2026_Pit_Nav.html">🚗 Pit Nav (#888)</a>
-</div>
-</div>
-
-<main>
-
-<section id="eta">
-  <h2>RR228 Live Pace Tracker</h2>
-  <div class="flag">⚠️ No confirmed pace plan is on file for this truck — RR228 is supported by the corporate Ford Racing crew (Mike Nienhuis, Kristen Goslawski, Daniel Zinn, Kylie Keller, David Liebmann), not the Lovell team. Unlike #888, there's no source ETA chart with target times for this entry, so this tracker works from <strong>actual pit times only</strong> — enter times as they're reported and it projects forward using real pace, same recalculation logic as the #888 tracker.</div>
-  <div class="card">
-    <div class="statsrow" id="etaStatsRow">
-      <div class="stat"><div class="num" id="statStart">—</div><div class="lab">Actual Start</div></div>
-      <div class="stat"><div class="num" id="statFinish">—</div><div class="lab">Proj. Finish</div></div>
-      <div class="stat"><div class="num" id="statPace">—</div><div class="lab">Current Pace</div></div>
-    </div>
-    <table id="etaTable">
-      <tr><th>Pit</th><th>RM</th><th>Sec. mi</th><th>Actual</th><th>Live ETA</th></tr>
-    </table>
-    <button class="secondary" onclick="resetEtaActuals()" style="margin-top:8px;">Reset actual times</button>
-    <p class="small">Start group: Unlimited (10:00am Friday). Rally Raid 4WD runs in the 30-second-interval "by class" block after the Unlimited Truck 2WD/4WD and Spec/Class 1 blocks clear — exact RR228 start time isn't itemized on the public schedule; enter it here once known and everything downstream will track from there.</p>
-    <p class="small">Pit mile markers (RM) are the official BitD race-mile distances — same course for every class, so these are accurate regardless of vehicle. Turn/approach notes below are course-based and apply to any chase vehicle following this truck.</p>
-    <p class="small">Turn notes: <strong>Pit 5 Mina</strong> — turn NE on Simon Lead Rd just before town. <strong>Pit 6 Coaldale</strong> — turn west on Hwy 6 at Coaldale Junction, ~0.5mi off highway. <strong>Pit 7 Tonopah</strong> — turn west on dirt road 2.4mi past the Texaco station, follow 1mi. <strong>Pit 8 Cottontail</strong> — at Hwy 95/266 junction, west side, hard to miss. <strong>Pit 9 Bonnie Claire</strong> — turn on Scotty's Castle Rd off Hwy 95. <strong>Pit 10 Omni Station</strong> — ~5mi south of Beatty, 0.5mi off west side, visible from 95. <strong>Pit 11 Amargosa</strong> — small town at Hwy 373 junction, ~0.5mi off highway, NW corner. <strong>Finish</strong> — from 95, right on Hwy 160, then right again in ~5mi.</p>
-    <p class="small unconfirmed">Fuel stop locations for RR228 aren't confirmed here — T1+ Raptor rally-raid trucks typically carry larger fuel cells with different range than #888's chase truck, so #888's fuel-stop pattern (Mina, Cottontail) shouldn't be assumed to apply. Check with the corporate Ford Racing crew if you need this.</p>
+<div id="v2rGate">
+  <div class="box">
+    <h2>🔒 V2R 2026 — Private</h2>
+    <p>Enter the team password to continue</p>
+    <form id="v2rForm">
+      <input type="password" id="v2rPwInput" autocomplete="current-password" placeholder="Password" autofocus>
+      <button type="submit">Unlock</button>
+      <div class="err" id="v2rErr"></div>
+    </form>
   </div>
-</section>
+</div>
 
-</main>
-
-<div class="footer-note">V2R 2026 · RR228 live pace tracker · actual-times-only, no fabricated plan data</div>
+<div id="v2rContent"></div>
 
 <script>
-const ETA_POINTS = [
-  { key:'start',  label:'Start (Dayton)',        mi:0 },
-  { key:'p1',     label:'Pit 1 – Weeks',         mi:45 },
-  { key:'p2',     label:'Pit 2 – Top Gun',       mi:75 },
-  { key:'p3',     label:'Pit 3 – Rawhide',       mi:110, flag:'no support — emergency only' },
-  { key:'p4',     label:'Pit 4 – Gabbs',         mi:135 },
-  { key:'p5',     label:'Pit 5 – Mina',          mi:175 },
-  { key:'p6',     label:'Pit 6 – Coaldale',      mi:230 },
-  { key:'p7',     label:'Pit 7 – Tonopah',       mi:285 },
-  { key:'p8',     label:'Pit 8 – Cottontail',    mi:345 },
-  { key:'p9',     label:'Pit 9 – Bonnie Claire', mi:390 },
-  { key:'p10',    label:'Pit 10 – Omni Station', mi:430 },
-  { key:'p11',    label:'Pit 11 – Amargosa Valley', mi:477 },
-  { key:'finish', label:'Finish (Crystal)',      mi:502 },
-];
-const STORAGE_KEY = 'v2rActualTimes_RR228';
+const V2R_SALT = "MJX6wzVe1Z0vzH2RL9TBmQ==";
+const V2R_IV = "xVXKmnimlyMpontF";
+const V2R_CT = "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";
+const V2R_STORAGE_KEY = "v2rSitePassword";
 
-function parseTimeInputToMinutes(hhmm){
-  const [h,m] = hhmm.split(':').map(Number);
-  return h*60+m;
-}
-function rollForward(mins, floor){
-  let v = mins;
-  while(v < floor) v += 1440;
-  return v;
-}
-function formatAbsMinutes(abs){
-  abs = Math.round(abs);
-  const dayOffset = Math.floor(abs/1440);
-  const m = ((abs%1440)+1440)%1440;
-  let h = Math.floor(m/60), mm = m%60;
-  const ampm = h>=12 ? 'PM':'AM';
-  let h12 = h%12; if(h12===0) h12=12;
-  return `${h12}:${String(mm).padStart(2,'0')} ${ampm}${dayOffset>0 ? ' (+1d)':''}`;
+function b64ToBytes(b64) {
+  return Uint8Array.from(atob(b64), c => c.charCodeAt(0));
 }
 
-function getActuals(){
-  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}'); } catch(e){ return {}; }
+async function v2rDeriveKey(password, saltB64) {
+  const enc = new TextEncoder();
+  const salt = b64ToBytes(saltB64);
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['decrypt']
+  );
 }
-function setActual(key, hhmm){
-  const a = getActuals();
-  if(hhmm) a[key]=hhmm; else delete a[key];
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(a));
-}
-function resetEtaActuals(){
-  if(confirm('Clear all actual arrival times for RR228?')){
-    localStorage.removeItem(STORAGE_KEY);
-    renderEta();
+
+async function v2rTryUnlock(password) {
+  try {
+    const key = await v2rDeriveKey(password, V2R_SALT);
+    const iv = b64ToBytes(V2R_IV);
+    const ct = b64ToBytes(V2R_CT);
+    const plainBuf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ct);
+    const html = new TextDecoder().decode(plainBuf);
+    const contentDiv = document.getElementById('v2rContent');
+    contentDiv.innerHTML = html;
+    // re-execute any script tags in the injected content (innerHTML doesn't run them)
+    contentDiv.querySelectorAll('script').forEach(oldScript => {
+      const newScript = document.createElement('script');
+      if (oldScript.src) { newScript.src = oldScript.src; }
+      else { newScript.textContent = oldScript.textContent; }
+      document.body.appendChild(newScript);
+    });
+    document.getElementById('v2rGate').style.display = 'none';
+    contentDiv.style.display = 'block';
+    localStorage.setItem(V2R_STORAGE_KEY, password);
+    return true;
+  } catch (e) {
+    return false;
   }
 }
 
-function computeEta(){
-  const actuals = getActuals();
-  let anchorAbs = null, anchorMi = 0, pace = null, anchorSet = false;
-  const rows = ETA_POINTS.map((p,i)=>{
-    const actualStr = actuals[p.key] || '';
-    let liveAbs = null, isActual=false;
-
-    if(i===0){
-      if(actualStr){ liveAbs = parseTimeInputToMinutes(actualStr); isActual=true; anchorAbs=liveAbs; anchorMi=p.mi; anchorSet=true; }
-    } else {
-      if(!anchorSet){
-        if(actualStr){
-          // first actual ever entered isn't at Start — treat it as the new anchor with no pace yet
-          liveAbs = parseTimeInputToMinutes(actualStr); isActual=true;
-          anchorAbs = liveAbs; anchorMi = p.mi; anchorSet = true;
-        }
-        // else: liveAbs stays null — nothing to project from yet
-      } else {
-        const distFromAnchor = p.mi - anchorMi;
-        if(actualStr){
-          let raw = parseTimeInputToMinutes(actualStr);
-          liveAbs = rollForward(raw, anchorAbs);
-          isActual = true;
-          const hrs = (liveAbs - anchorAbs)/60;
-          if(hrs>0) pace = distFromAnchor/hrs;
-          anchorAbs = liveAbs; anchorMi = p.mi;
-        } else if(pace){
-          liveAbs = anchorAbs + (distFromAnchor/pace)*60;
-        }
-        // else: no pace established yet and no actual here — liveAbs stays null
-      }
+window.addEventListener('DOMContentLoaded', async () => {
+  const saved = localStorage.getItem(V2R_STORAGE_KEY);
+  if (saved) {
+    const ok = await v2rTryUnlock(saved);
+    if (!ok) localStorage.removeItem(V2R_STORAGE_KEY);
+  }
+  document.getElementById('v2rForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const pw = document.getElementById('v2rPwInput').value;
+    const ok = await v2rTryUnlock(pw);
+    if (!ok) {
+      document.getElementById('v2rErr').textContent = 'Incorrect password — try again.';
+      document.getElementById('v2rPwInput').value = '';
+      document.getElementById('v2rPwInput').focus();
     }
-    return { p, isActual, liveAbs };
   });
-  return { rows, finalPace: pace };
-}
-
-function renderEta(){
-  const { rows, finalPace } = computeEta();
-  const table = document.getElementById('etaTable');
-  table.innerHTML = '<tr><th>Pit</th><th>RM</th><th>Sec. mi</th><th>Actual</th><th>Live ETA</th></tr>' +
-    rows.map((r,i)=>{
-      const p = r.p;
-      const prevMi = i===0 ? 0 : rows[i-1].p.mi;
-      const secMi = i===0 ? '—' : (p.mi - prevMi);
-      const flagHtml = p.flag ? ` <span class="pill unconfirmed">${p.flag}</span>` : '';
-      const liveStr = r.liveAbs!==null ? formatAbsMinutes(r.liveAbs) : '—';
-      const liveCellStyle = r.isActual ? 'font-weight:800; color:#c94414;' : '';
-      const actuals = getActuals();
-      return `<tr>
-        <td>${p.label}${flagHtml}</td>
-        <td>${p.mi}</td>
-        <td>${secMi}</td>
-        <td><input type="time" value="${actuals[p.key]||''}" style="width:110px; padding:4px;" onchange="setActual('${p.key}', this.value); renderEta();"></td>
-        <td style="${liveCellStyle}">${liveStr}${r.isActual?' ✓':''}</td>
-      </tr>`;
-    }).join('');
-
-  document.getElementById('statStart').textContent = rows[0].liveAbs!==null ? formatAbsMinutes(rows[0].liveAbs).split(' ')[0] : '—';
-  document.getElementById('statFinish').textContent = rows[rows.length-1].liveAbs!==null ? formatAbsMinutes(rows[rows.length-1].liveAbs).split(' ')[0] : '—';
-  document.getElementById('statPace').textContent = finalPace ? Math.round(finalPace)+' mph' : '—';
-}
-renderEta();
+});
 </script>
 
 </body>
