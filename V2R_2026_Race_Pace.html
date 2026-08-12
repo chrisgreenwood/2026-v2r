@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>V2R Race Pace — #888 Chase ETA</title>
+<style>
+  :root{ color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; padding:0 0 60px 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background:#f4f5f7; color:#1a1a1a;
+    -webkit-text-size-adjust: 100%;
+  }
+  .stickytop { position:sticky; top:0; z-index:10; }
+  header {
+    background:#0b1a33; color:#fff; padding:16px 16px 12px;
+  }
+  header .badge-row { display:flex; align-items:center; gap:8px; margin-bottom:2px; }
+  header .stkbadge {
+    background:#1e5fff; color:#fff; font-size:0.68rem; font-weight:800;
+    padding:3px 8px; border-radius:6px; letter-spacing:.05em; text-transform:uppercase;
+  }
+  header h1 { margin:0; font-size:1.15rem; line-height:1.3; }
+  header .sub { font-size:0.82rem; color:#b8c4d9; margin-top:4px; }
+  .backrow {
+    display:flex; gap:8px; padding:10px 12px; background:#132446;
+  }
+  .backrow a {
+    flex:1; text-align:center; color:#dbe4f5; background:#1c3260; text-decoration:none;
+    font-size:0.8rem; padding:9px 10px; border-radius:10px; font-weight:600;
+  }
+  main { padding: 14px 12px 0; max-width: 900px; margin: 0 auto; }
+  section { margin-bottom: 22px; }
+  h2 {
+    font-size:1rem; text-transform:uppercase; letter-spacing:.04em;
+    color:#0b1a33; border-bottom:2px solid #0b1a33; padding-bottom:6px; margin:0 0 10px;
+  }
+  .card {
+    background:#fff; border-radius:10px; padding:12px 14px; margin-bottom:10px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.08);
+  }
+  table { width:100%; border-collapse: collapse; font-size:0.82rem; background:#fff; border-radius:8px; overflow:hidden;}
+  th, td { text-align:left; padding:8px 6px; border-bottom:1px solid #eaeaea; vertical-align:top; }
+  th { background:#0b1a33; color:#fff; font-size:0.72rem; text-transform:uppercase; letter-spacing:.03em; }
+  tr:last-child td { border-bottom:none; }
+  .pill { font-size:0.68rem; padding:2px 6px; border-radius:8px; background:#eef1f7; color:#333; margin-left:4px;}
+  .pill.fuel { background:#146c2e; color:#fff; font-weight:700; }
+  .unconfirmed { color:#a9740b; }
+  .small { font-size:0.72rem; color:#777; }
+  .stat { background:#fff; border-radius:10px; padding:10px 12px; text-align:center; box-shadow:0 1px 2px rgba(0,0,0,0.08);}
+  .stat .num { font-size:1.3rem; font-weight:800; color:#0b1a33; }
+  .stat .lab { font-size:0.68rem; color:#666; text-transform:uppercase; letter-spacing:.03em; }
+  .statsrow { display:flex; gap:8px; overflow-x:auto; margin-bottom:12px; }
+  .statsrow .stat { flex:1 0 auto; min-width:90px; }
+  button {
+    background:#0b1a33; color:#fff; border:none; border-radius:8px; padding:9px 14px;
+    font-size:0.85rem; font-weight:600;
+  }
+  button.secondary { background:#e8edf7; color:#0b1a33; }
+  .footer-note { text-align:center; color:#999; font-size:0.7rem; padding:20px 12px 0;}
+</style>
+</head>
+<body>
+
+<div class="stickytop">
+<header>
+  <div class="badge-row"><span class="stkbadge">🏁 Stock Production Truck Full</span></div>
+  <h1>Race Pace — #888 Chase ETA</h1>
+  <div class="sub">F-150 Raptor (3.5L) · Lovell Off-Road · Brad Lovell / Adam Lovell (nav)</div>
+</header>
+<div class="backrow">
+  <a href="V2R_2026_Race_Reference.html">📋 Full Reference</a>
+  <a href="V2R_2026_Pit_Nav.html">🚗 Pit Nav</a>
+  <a href="V2R_2026_Race_Pace_RR228.html">🏎️ RR228 Pace</a>
+</div>
+</div>
+
+<main>
+
+<section id="eta">
+  <h2>#888 Chase ETA Chart (Command Chase / Blue F250)</h2>
+  <div class="card">
+    <div class="statsrow" id="etaStatsRow">
+      <div class="stat"><div class="num" id="statStart">12:30</div><div class="lab">Start</div></div>
+      <div class="stat"><div class="num" id="statFinish">~11:05</div><div class="lab">Proj. Finish</div></div>
+      <div class="stat"><div class="num" id="statPace">—</div><div class="lab">Current Pace</div></div>
+    </div>
+    <table id="etaTable">
+      <tr><th>Pit</th><th>RM</th><th>Sec. mi</th><th>Plan ETA</th><th>Actual</th><th>Live ETA</th></tr>
+    </table>
+    <button class="secondary" onclick="resetEtaActuals()" style="margin-top:8px;">Reset actual times</button>
+    <p class="small">Enter the actual time you (or the crew) arrive at a pit — every ETA past that point recalculates using the pace of that most recent leg. This data is shared with the Pit Nav page (same device/browser) — entries made while driving carry over here automatically.</p>
+    <p class="small">Fuel cap 62 gal, est. 3 mpg, ~186mi range. Turn notes: <strong>Pit 5 Mina</strong> — turn NE on Simon Lead Rd just before town. <strong>Pit 6 Coaldale</strong> — turn west on Hwy 6 at Coaldale Junction, ~0.5mi off highway. <strong>Pit 7 Tonopah</strong> — turn west on dirt road 2.4mi past the Texaco station, follow 1mi. <strong>Pit 8 Cottontail</strong> — at Hwy 95/266 junction, west side, hard to miss. <strong>Pit 9 Bonnie Claire</strong> — turn on Scotty's Castle Rd off Hwy 95. <strong>Pit 10 Omni Station</strong> — ~5mi south of Beatty, 0.5mi off west side, visible from 95. <strong>Pit 11 Amargosa</strong> — small town at Hwy 373 junction, ~0.5mi off highway, NW corner. <strong>Finish</strong> — from 95, right on Hwy 160, then right again in ~5mi.</p>
+    <p class="small unconfirmed">A parallel ETA chart exists for the #773 Ranger Raptor chase route (RTR program, 50-gal tank, 3.3 mpg, ~165mi range) — same pit sequence, nearly identical timing, support is box truck + fuel truck + F450 backup rather than the Lovell chase fleet.</p>
+  </div>
+</section>
+
+</main>
+
+<div class="footer-note">V2R 2026 · #888 chase ETA chart · shares actual-time data with Pit Nav on this device</div>
+
+<script>
+const ETA_POINTS = [
+  { key:'start',  label:'Start (Dayton)',        mi:0,   plan:'12:30 PM' },
+  { key:'p1',     label:'Pit 1 – Weeks',         mi:45,  plan:'1:32 PM',  flag:'' },
+  { key:'p2',     label:'Pit 2 – Top Gun',       mi:75,  plan:'2:10 PM' },
+  { key:'p3',     label:'Pit 3 – Rawhide',       mi:110, plan:'2:58 PM', flag:'no support — emergency only' },
+  { key:'p4',     label:'Pit 4 – Gabbs',         mi:135, plan:'3:31 PM' },
+  { key:'p5',     label:'Pit 5 – Mina',          mi:175, plan:'4:25 PM', fuel:true },
+  { key:'p6',     label:'Pit 6 – Coaldale',      mi:230, plan:'5:28 PM' },
+  { key:'p7',     label:'Pit 7 – Tonopah',       mi:285, plan:'6:34 PM' },
+  { key:'p8',     label:'Pit 8 – Cottontail',    mi:345, plan:'7:42 PM', fuel:true },
+  { key:'p9',     label:'Pit 9 – Bonnie Claire', mi:390, plan:'8:40 PM' },
+  { key:'p10',    label:'Pit 10 – Omni Station', mi:430, plan:'9:28 PM' },
+  { key:'p11',    label:'Pit 11 – Amargosa Valley', mi:477, plan:'10:38 PM' },
+  { key:'finish', label:'Finish (Crystal)',      mi:502, plan:'11:05 PM' },
+];
+
+function parseClockToMinutes(str){
+  const m = str.trim().match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if(!m) return null;
+  let h = parseInt(m[1],10) % 12;
+  if(/PM/i.test(m[3])) h += 12;
+  return h*60 + parseInt(m[2],10);
+}
+function parseTimeInputToMinutes(hhmm){
+  const [h,m] = hhmm.split(':').map(Number);
+  return h*60+m;
+}
+function rollForward(mins, floor){
+  let v = mins;
+  while(v < floor) v += 1440;
+  return v;
+}
+function formatAbsMinutes(abs){
+  abs = Math.round(abs);
+  const dayOffset = Math.floor(abs/1440);
+  const m = ((abs%1440)+1440)%1440;
+  let h = Math.floor(m/60), mm = m%60;
+  const ampm = h>=12 ? 'PM':'AM';
+  let h12 = h%12; if(h12===0) h12=12;
+  return `${h12}:${String(mm).padStart(2,'0')} ${ampm}${dayOffset>0 ? ' (+1d)':''}`;
+}
+
+function getActuals(){
+  try{ return JSON.parse(localStorage.getItem('v2rActualTimes')||'{}'); } catch(e){ return {}; }
+}
+function setActual(key, hhmm){
+  const a = getActuals();
+  if(hhmm) a[key]=hhmm; else delete a[key];
+  localStorage.setItem('v2rActualTimes', JSON.stringify(a));
+}
+function resetEtaActuals(){
+  if(confirm('Clear all actual arrival times?')){
+    localStorage.removeItem('v2rActualTimes');
+    renderEta();
+  }
+}
+
+function computeEta(){
+  const actuals = getActuals();
+  // precompute plan absolute minutes (monotonic, handles midnight rollover)
+  let planAbs = [];
+  let prevPlan = null;
+  ETA_POINTS.forEach((p,i)=>{
+    let raw = parseClockToMinutes(p.plan);
+    let abs = prevPlan===null ? raw : rollForward(raw, prevPlan);
+    planAbs.push(abs);
+    prevPlan = abs;
+  });
+
+  let anchorAbs = null, anchorMi = 0, pace = null, anchorIdx = -1;
+  const rows = ETA_POINTS.map((p,i)=>{
+    const actualStr = actuals[p.key] || '';
+    let liveAbs, isActual=false, legPace=null;
+
+    if(i===0){
+      if(actualStr){ liveAbs = parseTimeInputToMinutes(actualStr); isActual=true; }
+      else liveAbs = planAbs[0];
+      anchorAbs = liveAbs; anchorMi = p.mi; anchorIdx = 0;
+    } else {
+      const distFromAnchor = p.mi - anchorMi;
+      if(actualStr){
+        let raw = parseTimeInputToMinutes(actualStr);
+        liveAbs = rollForward(raw, anchorAbs);
+        isActual = true;
+        const hrs = (liveAbs - anchorAbs)/60;
+        legPace = hrs>0 ? (distFromAnchor/hrs) : null;
+        anchorAbs = liveAbs; anchorMi = p.mi; pace = legPace; anchorIdx = i;
+      } else {
+        if(pace){
+          liveAbs = anchorAbs + (distFromAnchor/pace)*60;
+        } else {
+          // no actual pace established yet — carry forward plan's offset from the anchor point
+          liveAbs = anchorAbs + (planAbs[i] - planAbs[anchorIdx]);
+        }
+      }
+    }
+    return { p, isActual, liveAbs, legPace };
+  });
+  return { rows, finalPace: pace };
+}
+
+function renderEta(){
+  const { rows, finalPace } = computeEta();
+  const table = document.getElementById('etaTable');
+  table.innerHTML = '<tr><th>Pit</th><th>RM</th><th>Sec. mi</th><th>Plan ETA</th><th>Actual</th><th>Live ETA</th></tr>' +
+    rows.map((r,i)=>{
+      const p = r.p;
+      const prevMi = i===0 ? 0 : rows[i-1].p.mi;
+      const secMi = i===0 ? '—' : (p.mi - prevMi);
+      const flagHtml = p.flag ? ` <span class="pill unconfirmed">${p.flag}</span>` : '';
+      const fuelHtml = p.fuel ? ` <span class="pill fuel">⛽ Fuel stop</span>` : '';
+      const rowStyle = p.fuel ? ' style="background:#eaf6ec;"' : '';
+      const liveStr = formatAbsMinutes(r.liveAbs);
+      const liveCellStyle = r.isActual ? 'font-weight:800; color:#146c2e;' : '';
+      return `<tr${rowStyle}>
+        <td>${p.label}${flagHtml}${fuelHtml}</td>
+        <td>${p.mi}</td>
+        <td>${secMi}</td>
+        <td>${p.plan}</td>
+        <td><input type="time" value="${localStorage.getItem('v2rActualTimes') ? (JSON.parse(localStorage.getItem('v2rActualTimes'))[p.key]||'') : ''}" style="width:110px; padding:4px;" onchange="setActual('${p.key}', this.value); renderEta();"></td>
+        <td style="${liveCellStyle}">${liveStr}${r.isActual?' ✓':''}</td>
+      </tr>`;
+    }).join('');
+
+  document.getElementById('statStart').textContent = formatAbsMinutes(rows[0].liveAbs).split(' ')[0];
+  document.getElementById('statFinish').textContent = formatAbsMinutes(rows[rows.length-1].liveAbs).split(' ')[0];
+  document.getElementById('statPace').textContent = finalPace ? Math.round(finalPace)+' mph' : '—';
+}
+renderEta();
+</script>
+
+</body>
+</html>

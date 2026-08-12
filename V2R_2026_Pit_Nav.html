@@ -116,10 +116,16 @@
 </head>
 <body>
 
-<header>
-  <span class="title">🚗 Pit Nav — #888 Chase</span>
-  <a class="back" href="V2R_2026_Race_Reference.html">Full Reference →</a>
+<header style="display:block;">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <span class="title">🚗 Pit Nav — #888 Chase</span>
+  </div>
+  <div style="font-size:0.72rem; color:#9fb3d9; margin-top:2px;">F-150 Raptor (3.5L) · Stock Production Truck Full · Brad Lovell / Adam Lovell</div>
 </header>
+<div style="display:flex; gap:8px; padding:10px 12px; background:#132446;">
+  <a href="V2R_2026_Race_Reference.html" style="flex:1; text-align:center; color:#dbe4f5; background:#1c3260; text-decoration:none; font-size:0.8rem; padding:9px 10px; border-radius:10px; font-weight:600;">📋 Full Reference</a>
+  <a href="V2R_2026_Race_Pace.html" style="flex:1; text-align:center; color:#dbe4f5; background:#1c3260; text-decoration:none; font-size:0.8rem; padding:9px 10px; border-radius:10px; font-weight:600;">📈 Race Pace</a>
+</div>
 
 <main>
 
@@ -143,6 +149,8 @@
     </div>
 
     <div class="flagnote" id="flagBox" style="display:none;" id="flagBoxText"></div>
+
+    <div class="flagnote" id="fuelBox" style="display:none; background:#12331c; border-left-color:#2ecc71; color:#a8f0bf;">⛽ Expected fuel stop at this pit</div>
 
     <div class="turnnote" style="border-left-color:#1e5fff;">
       <div class="lab" style="color:#1e5fff;">Actual arrival at destination</div>
@@ -249,7 +257,8 @@ const legs = [
     note:"Pit 4 Gabbs is a town." },
   { from:"Pit 4 – Gabbs", to:"Pit 5 – Mina", dist:"42.4", eta:"4:25 PM",
     saddr:"38.8703,-117.92299", daddr:"38.42102,-118.08792",
-    note:"Turn NE on Simon Lead Rd just before the town of Mina." },
+    note:"Turn NE on Simon Lead Rd just before the town of Mina.",
+    fuel:true },
   { from:"Pit 5 – Mina", to:"Pit 6 – Coaldale", dist:"32.6", eta:"5:28 PM",
     saddr:"38.42102,-118.08792", daddr:"38.03006,-117.89209",
     note:"Turn west on Hwy 6 at Coaldale Junction. ~0.5 mi off the highway." },
@@ -258,7 +267,8 @@ const legs = [
     note:"Turn west on dirt road 2.4 mi past the Texaco station. Follow dirt road 1 mi." },
   { from:"Pit 7 – Tonopah", to:"Pit 8 – Cottontail", dist:"39.6", eta:"7:42 PM",
     saddr:"38.0264,-117.25716", daddr:"37.49879,-117.1844",
-    note:"At Hwy 95 / 266 junction, west side of highway. Hard to miss." },
+    note:"At Hwy 95 / 266 junction, west side of highway. Hard to miss.",
+    fuel:true },
   { from:"Pit 8 – Cottontail", to:"Pit 9 – Bonnie Claire", dist:"23.1", eta:"8:40 PM",
     saddr:"37.49879,-117.1844", daddr:"37.22625,-117.12766",
     note:"Search for \u2018Bonnie Claire\u2019 turn on Scotty\u2019s Castle Rd off Hwy 95." },
@@ -364,6 +374,9 @@ function render(){
   if (leg.flag) { flagBox.style.display='block'; flagBox.textContent = leg.flag; }
   else { flagBox.style.display='none'; }
 
+  const fuelBox = document.getElementById('fuelBox');
+  fuelBox.style.display = leg.fuel ? 'block' : 'none';
+
   const actuals = getActuals();
   const destKey = DEST_KEYS[idx];
   document.getElementById('actualInput').value = actuals[destKey] || '';
@@ -384,7 +397,7 @@ function render(){
 
   const jl = document.getElementById('jumpList');
   jl.innerHTML = legs.map((l,i)=>
-    `<button class="${i===idx?'active':''}" onclick="jumpTo(${i})">${i+1}. ${l.from} → ${l.to} <span style="color:#8a94a6;">(${l.dist} mi, ETA ${l.eta})</span></button>`
+    `<button class="${i===idx?'active':''}" onclick="jumpTo(${i})">${i+1}. ${l.from} → ${l.to}${l.fuel?' ⛽':''} <span style="color:#8a94a6;">(${l.dist} mi, ETA ${l.eta})</span></button>`
   ).join('');
 
   localStorage.setItem('v2rPitNavLeg', idx);

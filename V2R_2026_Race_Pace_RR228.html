@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>V2R Race Pace — RR228 T1+ Raptor</title>
+<style>
+  :root{ color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; padding:0 0 60px 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background:#f7f4f0; color:#1a1a1a;
+    -webkit-text-size-adjust: 100%;
+  }
+  .stickytop { position:sticky; top:0; z-index:10; }
+  header {
+    background:#161311; color:#fff; padding:16px 16px 12px;
+  }
+  header .badge-row { display:flex; align-items:center; gap:8px; margin-bottom:2px; }
+  header .rrbadge {
+    background:#ff5a1f; color:#161311; font-size:0.68rem; font-weight:800;
+    padding:3px 8px; border-radius:6px; letter-spacing:.05em; text-transform:uppercase;
+  }
+  header h1 { margin:0; font-size:1.15rem; line-height:1.3; }
+  header .sub { font-size:0.82rem; color:#c9beb2; margin-top:4px; }
+  .stripes {
+    height:6px;
+    background:repeating-linear-gradient(45deg, #ff5a1f 0 10px, #161311 10px 20px);
+  }
+  .backrow {
+    display:flex; gap:8px; padding:10px 12px; background:#231e1a; flex-wrap:wrap;
+  }
+  .backrow a {
+    flex:1 0 auto; min-width:120px; text-align:center; color:#f0e6dc; background:#332a24; text-decoration:none;
+    font-size:0.78rem; padding:9px 10px; border-radius:10px; font-weight:600;
+  }
+  main { padding: 14px 12px 0; max-width: 900px; margin: 0 auto; }
+  section { margin-bottom: 22px; }
+  h2 {
+    font-size:1rem; text-transform:uppercase; letter-spacing:.04em;
+    color:#161311; border-bottom:2px solid #ff5a1f; padding-bottom:6px; margin:0 0 10px;
+  }
+  .card {
+    background:#fff; border-radius:10px; padding:12px 14px; margin-bottom:10px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.08); border-left:3px solid #ff5a1f;
+  }
+  .flag {
+    background:#fff3cd; border:1px solid #f0c36d; border-radius:8px;
+    padding:8px 10px; font-size:0.82rem; margin-bottom:10px; color:#6b4e00;
+  }
+  table { width:100%; border-collapse: collapse; font-size:0.82rem; background:#fff; border-radius:8px; overflow:hidden;}
+  th, td { text-align:left; padding:8px 6px; border-bottom:1px solid #eaeaea; vertical-align:top; }
+  th { background:#161311; color:#ff5a1f; font-size:0.72rem; text-transform:uppercase; letter-spacing:.03em; }
+  tr:last-child td { border-bottom:none; }
+  .pill { font-size:0.68rem; padding:2px 6px; border-radius:8px; background:#f3ece3; color:#333; margin-left:4px;}
+  .unconfirmed { color:#a9740b; }
+  .small { font-size:0.72rem; color:#777; }
+  .stat { background:#fff; border-radius:10px; padding:10px 12px; text-align:center; box-shadow:0 1px 2px rgba(0,0,0,0.08); border-top:3px solid #ff5a1f;}
+  .stat .num { font-size:1.3rem; font-weight:800; color:#161311; }
+  .stat .lab { font-size:0.68rem; color:#666; text-transform:uppercase; letter-spacing:.03em; }
+  .statsrow { display:flex; gap:8px; overflow-x:auto; margin-bottom:12px; }
+  .statsrow .stat { flex:1 0 auto; min-width:90px; }
+  button {
+    background:#ff5a1f; color:#161311; border:none; border-radius:8px; padding:9px 14px;
+    font-size:0.85rem; font-weight:700;
+  }
+  button.secondary { background:#f3ece3; color:#161311; }
+  .footer-note { text-align:center; color:#999; font-size:0.7rem; padding:20px 12px 0;}
+</style>
+</head>
+<body>
+
+<div class="stickytop">
+<header>
+  <div class="badge-row"><span class="rrbadge">🏎️ Rally Raid</span></div>
+  <h1>Race Pace — RR228 T1+ Raptor</h1>
+  <div class="sub">Rally Raid 4WD · Mitch Guthrie Jr. / Kellon Walch</div>
+</header>
+<div class="stripes"></div>
+<div class="backrow">
+  <a href="V2R_2026_Race_Reference.html">📋 Full Reference</a>
+  <a href="V2R_2026_Race_Pace.html">🏁 #888 Race Pace</a>
+  <a href="V2R_2026_Pit_Nav.html">🚗 Pit Nav (#888)</a>
+</div>
+</div>
+
+<main>
+
+<section id="eta">
+  <h2>RR228 Live Pace Tracker</h2>
+  <div class="flag">⚠️ No confirmed pace plan is on file for this truck — RR228 is supported by the corporate Ford Racing crew (Mike Nienhuis, Kristen Goslawski, Daniel Zinn, Kylie Keller, David Liebmann), not the Lovell team. Unlike #888, there's no source ETA chart with target times for this entry, so this tracker works from <strong>actual pit times only</strong> — enter times as they're reported and it projects forward using real pace, same recalculation logic as the #888 tracker.</div>
+  <div class="card">
+    <div class="statsrow" id="etaStatsRow">
+      <div class="stat"><div class="num" id="statStart">—</div><div class="lab">Actual Start</div></div>
+      <div class="stat"><div class="num" id="statFinish">—</div><div class="lab">Proj. Finish</div></div>
+      <div class="stat"><div class="num" id="statPace">—</div><div class="lab">Current Pace</div></div>
+    </div>
+    <table id="etaTable">
+      <tr><th>Pit</th><th>RM</th><th>Sec. mi</th><th>Actual</th><th>Live ETA</th></tr>
+    </table>
+    <button class="secondary" onclick="resetEtaActuals()" style="margin-top:8px;">Reset actual times</button>
+    <p class="small">Start group: Unlimited (10:00am Friday). Rally Raid 4WD runs in the 30-second-interval "by class" block after the Unlimited Truck 2WD/4WD and Spec/Class 1 blocks clear — exact RR228 start time isn't itemized on the public schedule; enter it here once known and everything downstream will track from there.</p>
+    <p class="small">Pit mile markers (RM) are the official BitD race-mile distances — same course for every class, so these are accurate regardless of vehicle. Turn/approach notes below are course-based and apply to any chase vehicle following this truck.</p>
+    <p class="small">Turn notes: <strong>Pit 5 Mina</strong> — turn NE on Simon Lead Rd just before town. <strong>Pit 6 Coaldale</strong> — turn west on Hwy 6 at Coaldale Junction, ~0.5mi off highway. <strong>Pit 7 Tonopah</strong> — turn west on dirt road 2.4mi past the Texaco station, follow 1mi. <strong>Pit 8 Cottontail</strong> — at Hwy 95/266 junction, west side, hard to miss. <strong>Pit 9 Bonnie Claire</strong> — turn on Scotty's Castle Rd off Hwy 95. <strong>Pit 10 Omni Station</strong> — ~5mi south of Beatty, 0.5mi off west side, visible from 95. <strong>Pit 11 Amargosa</strong> — small town at Hwy 373 junction, ~0.5mi off highway, NW corner. <strong>Finish</strong> — from 95, right on Hwy 160, then right again in ~5mi.</p>
+    <p class="small unconfirmed">Fuel stop locations for RR228 aren't confirmed here — T1+ Raptor rally-raid trucks typically carry larger fuel cells with different range than #888's chase truck, so #888's fuel-stop pattern (Mina, Cottontail) shouldn't be assumed to apply. Check with the corporate Ford Racing crew if you need this.</p>
+  </div>
+</section>
+
+</main>
+
+<div class="footer-note">V2R 2026 · RR228 live pace tracker · actual-times-only, no fabricated plan data</div>
+
+<script>
+const ETA_POINTS = [
+  { key:'start',  label:'Start (Dayton)',        mi:0 },
+  { key:'p1',     label:'Pit 1 – Weeks',         mi:45 },
+  { key:'p2',     label:'Pit 2 – Top Gun',       mi:75 },
+  { key:'p3',     label:'Pit 3 – Rawhide',       mi:110, flag:'no support — emergency only' },
+  { key:'p4',     label:'Pit 4 – Gabbs',         mi:135 },
+  { key:'p5',     label:'Pit 5 – Mina',          mi:175 },
+  { key:'p6',     label:'Pit 6 – Coaldale',      mi:230 },
+  { key:'p7',     label:'Pit 7 – Tonopah',       mi:285 },
+  { key:'p8',     label:'Pit 8 – Cottontail',    mi:345 },
+  { key:'p9',     label:'Pit 9 – Bonnie Claire', mi:390 },
+  { key:'p10',    label:'Pit 10 – Omni Station', mi:430 },
+  { key:'p11',    label:'Pit 11 – Amargosa Valley', mi:477 },
+  { key:'finish', label:'Finish (Crystal)',      mi:502 },
+];
+const STORAGE_KEY = 'v2rActualTimes_RR228';
+
+function parseTimeInputToMinutes(hhmm){
+  const [h,m] = hhmm.split(':').map(Number);
+  return h*60+m;
+}
+function rollForward(mins, floor){
+  let v = mins;
+  while(v < floor) v += 1440;
+  return v;
+}
+function formatAbsMinutes(abs){
+  abs = Math.round(abs);
+  const dayOffset = Math.floor(abs/1440);
+  const m = ((abs%1440)+1440)%1440;
+  let h = Math.floor(m/60), mm = m%60;
+  const ampm = h>=12 ? 'PM':'AM';
+  let h12 = h%12; if(h12===0) h12=12;
+  return `${h12}:${String(mm).padStart(2,'0')} ${ampm}${dayOffset>0 ? ' (+1d)':''}`;
+}
+
+function getActuals(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}'); } catch(e){ return {}; }
+}
+function setActual(key, hhmm){
+  const a = getActuals();
+  if(hhmm) a[key]=hhmm; else delete a[key];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(a));
+}
+function resetEtaActuals(){
+  if(confirm('Clear all actual arrival times for RR228?')){
+    localStorage.removeItem(STORAGE_KEY);
+    renderEta();
+  }
+}
+
+function computeEta(){
+  const actuals = getActuals();
+  let anchorAbs = null, anchorMi = 0, pace = null, anchorSet = false;
+  const rows = ETA_POINTS.map((p,i)=>{
+    const actualStr = actuals[p.key] || '';
+    let liveAbs = null, isActual=false;
+
+    if(i===0){
+      if(actualStr){ liveAbs = parseTimeInputToMinutes(actualStr); isActual=true; anchorAbs=liveAbs; anchorMi=p.mi; anchorSet=true; }
+    } else {
+      if(!anchorSet){
+        if(actualStr){
+          // first actual ever entered isn't at Start — treat it as the new anchor with no pace yet
+          liveAbs = parseTimeInputToMinutes(actualStr); isActual=true;
+          anchorAbs = liveAbs; anchorMi = p.mi; anchorSet = true;
+        }
+        // else: liveAbs stays null — nothing to project from yet
+      } else {
+        const distFromAnchor = p.mi - anchorMi;
+        if(actualStr){
+          let raw = parseTimeInputToMinutes(actualStr);
+          liveAbs = rollForward(raw, anchorAbs);
+          isActual = true;
+          const hrs = (liveAbs - anchorAbs)/60;
+          if(hrs>0) pace = distFromAnchor/hrs;
+          anchorAbs = liveAbs; anchorMi = p.mi;
+        } else if(pace){
+          liveAbs = anchorAbs + (distFromAnchor/pace)*60;
+        }
+        // else: no pace established yet and no actual here — liveAbs stays null
+      }
+    }
+    return { p, isActual, liveAbs };
+  });
+  return { rows, finalPace: pace };
+}
+
+function renderEta(){
+  const { rows, finalPace } = computeEta();
+  const table = document.getElementById('etaTable');
+  table.innerHTML = '<tr><th>Pit</th><th>RM</th><th>Sec. mi</th><th>Actual</th><th>Live ETA</th></tr>' +
+    rows.map((r,i)=>{
+      const p = r.p;
+      const prevMi = i===0 ? 0 : rows[i-1].p.mi;
+      const secMi = i===0 ? '—' : (p.mi - prevMi);
+      const flagHtml = p.flag ? ` <span class="pill unconfirmed">${p.flag}</span>` : '';
+      const liveStr = r.liveAbs!==null ? formatAbsMinutes(r.liveAbs) : '—';
+      const liveCellStyle = r.isActual ? 'font-weight:800; color:#c94414;' : '';
+      const actuals = getActuals();
+      return `<tr>
+        <td>${p.label}${flagHtml}</td>
+        <td>${p.mi}</td>
+        <td>${secMi}</td>
+        <td><input type="time" value="${actuals[p.key]||''}" style="width:110px; padding:4px;" onchange="setActual('${p.key}', this.value); renderEta();"></td>
+        <td style="${liveCellStyle}">${liveStr}${r.isActual?' ✓':''}</td>
+      </tr>`;
+    }).join('');
+
+  document.getElementById('statStart').textContent = rows[0].liveAbs!==null ? formatAbsMinutes(rows[0].liveAbs).split(' ')[0] : '—';
+  document.getElementById('statFinish').textContent = rows[rows.length-1].liveAbs!==null ? formatAbsMinutes(rows[rows.length-1].liveAbs).split(' ')[0] : '—';
+  document.getElementById('statPace').textContent = finalPace ? Math.round(finalPace)+' mph' : '—';
+}
+renderEta();
+</script>
+
+</body>
+</html>
