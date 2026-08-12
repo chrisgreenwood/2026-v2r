@@ -393,31 +393,150 @@
 <section id="eta">
   <h2>#888 Chase ETA Chart (Command Chase / Blue F250)</h2>
   <div class="card">
-    <div class="statsrow">
-      <div class="stat"><div class="num">12:30</div><div class="lab">Timed Start</div></div>
-      <div class="stat"><div class="num">~11:05</div><div class="lab">Proj. Finish</div></div>
-      <div class="stat"><div class="num">10:35</div><div class="lab">Total Time</div></div>
+    <div class="statsrow" id="etaStatsRow">
+      <div class="stat"><div class="num" id="statStart">12:30</div><div class="lab">Start</div></div>
+      <div class="stat"><div class="num" id="statFinish">~11:05</div><div class="lab">Proj. Finish</div></div>
+      <div class="stat"><div class="num" id="statPace">—</div><div class="lab">Current Pace</div></div>
     </div>
-    <table>
-      <tr><th>Pit</th><th>RM</th><th>Section mi</th><th>Avg Speed</th><th>ETA</th></tr>
-      <tr><td>Start (Dayton)</td><td>0</td><td>—</td><td>—</td><td>12:30 PM</td></tr>
-      <tr><td>Pit 1 – Weeks</td><td>45</td><td>43.7</td><td>42 mph</td><td>1:32 PM</td></tr>
-      <tr><td>Pit 2 – Top Gun</td><td>75</td><td>29.2</td><td>47 mph</td><td>2:10 PM</td></tr>
-      <tr><td>Pit 3 – Rawhide <span class="pill unconfirmed">no support — emergency only</span></td><td>110</td><td>36.3</td><td>45 mph</td><td>2:58 PM</td></tr>
-      <tr><td>Pit 4 – Gabbs</td><td>135</td><td>25</td><td>45 mph</td><td>3:31 PM</td></tr>
-      <tr><td>Pit 5 – Mina</td><td>175</td><td>40</td><td>45 mph</td><td>4:25 PM</td></tr>
-      <tr><td>Pit 6 – Coaldale</td><td>230</td><td>55</td><td>55 mph</td><td>5:28 PM</td></tr>
-      <tr><td>Pit 7 – Tonopah</td><td>285</td><td>55</td><td>50 mph</td><td>6:34 PM</td></tr>
-      <tr><td>Pit 8 – Cottontail</td><td>345</td><td>60</td><td>53 mph</td><td>7:42 PM</td></tr>
-      <tr><td>Pit 9 – Bonnie Claire</td><td>390</td><td>45</td><td>50 mph</td><td>8:40 PM</td></tr>
-      <tr><td>Pit 10 – Omni Station</td><td>430</td><td>40</td><td>50 mph</td><td>9:28 PM</td></tr>
-      <tr><td>Pit 11 – Amargosa Valley</td><td>477</td><td>47</td><td>40 mph</td><td>10:38 PM</td></tr>
-      <tr><td><strong>Finish (Crystal)</strong></td><td>502</td><td>25</td><td>55 mph</td><td><strong>11:05 PM</strong></td></tr>
+    <table id="etaTable">
+      <tr><th>Pit</th><th>RM</th><th>Sec. mi</th><th>Plan ETA</th><th>Actual</th><th>Live ETA</th></tr>
     </table>
+    <button class="secondary" onclick="resetEtaActuals()" style="margin-top:8px;">Reset actual times</button>
+    <p class="small">Enter the actual time you (or the crew) arrive at a pit — every ETA past that point recalculates using the pace of that most recent leg. This data is shared with the Pit Nav page (same device/browser) — entries made while driving carry over here automatically.</p>
     <p class="small">Fuel cap 62 gal, est. 3 mpg, ~186mi range. Turn notes: <strong>Pit 5 Mina</strong> — turn NE on Simon Lead Rd just before town. <strong>Pit 6 Coaldale</strong> — turn west on Hwy 6 at Coaldale Junction, ~0.5mi off highway. <strong>Pit 7 Tonopah</strong> — turn west on dirt road 2.4mi past the Texaco station, follow 1mi. <strong>Pit 8 Cottontail</strong> — at Hwy 95/266 junction, west side, hard to miss. <strong>Pit 9 Bonnie Claire</strong> — turn on Scotty's Castle Rd off Hwy 95. <strong>Pit 10 Omni Station</strong> — ~5mi south of Beatty, 0.5mi off west side, visible from 95. <strong>Pit 11 Amargosa</strong> — small town at Hwy 373 junction, ~0.5mi off highway, NW corner. <strong>Finish</strong> — from 95, right on Hwy 160, then right again in ~5mi.</p>
     <p class="small unconfirmed">A parallel ETA chart exists for the #773 Ranger Raptor chase route (RTR program, 50-gal tank, 3.3 mpg, ~165mi range) — same pit sequence, nearly identical timing, support is box truck + fuel truck + F450 backup rather than the Lovell chase fleet.</p>
   </div>
 </section>
+
+<script>
+const ETA_POINTS = [
+  { key:'start',  label:'Start (Dayton)',        mi:0,   plan:'12:30 PM' },
+  { key:'p1',     label:'Pit 1 – Weeks',         mi:45,  plan:'1:32 PM',  flag:'' },
+  { key:'p2',     label:'Pit 2 – Top Gun',       mi:75,  plan:'2:10 PM' },
+  { key:'p3',     label:'Pit 3 – Rawhide',       mi:110, plan:'2:58 PM', flag:'no support — emergency only' },
+  { key:'p4',     label:'Pit 4 – Gabbs',         mi:135, plan:'3:31 PM' },
+  { key:'p5',     label:'Pit 5 – Mina',          mi:175, plan:'4:25 PM' },
+  { key:'p6',     label:'Pit 6 – Coaldale',      mi:230, plan:'5:28 PM' },
+  { key:'p7',     label:'Pit 7 – Tonopah',       mi:285, plan:'6:34 PM' },
+  { key:'p8',     label:'Pit 8 – Cottontail',    mi:345, plan:'7:42 PM' },
+  { key:'p9',     label:'Pit 9 – Bonnie Claire', mi:390, plan:'8:40 PM' },
+  { key:'p10',    label:'Pit 10 – Omni Station', mi:430, plan:'9:28 PM' },
+  { key:'p11',    label:'Pit 11 – Amargosa Valley', mi:477, plan:'10:38 PM' },
+  { key:'finish', label:'Finish (Crystal)',      mi:502, plan:'11:05 PM' },
+];
+
+function parseClockToMinutes(str){
+  const m = str.trim().match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if(!m) return null;
+  let h = parseInt(m[1],10) % 12;
+  if(/PM/i.test(m[3])) h += 12;
+  return h*60 + parseInt(m[2],10);
+}
+function parseTimeInputToMinutes(hhmm){
+  const [h,m] = hhmm.split(':').map(Number);
+  return h*60+m;
+}
+function rollForward(mins, floor){
+  let v = mins;
+  while(v < floor) v += 1440;
+  return v;
+}
+function formatAbsMinutes(abs){
+  abs = Math.round(abs);
+  const dayOffset = Math.floor(abs/1440);
+  const m = ((abs%1440)+1440)%1440;
+  let h = Math.floor(m/60), mm = m%60;
+  const ampm = h>=12 ? 'PM':'AM';
+  let h12 = h%12; if(h12===0) h12=12;
+  return `${h12}:${String(mm).padStart(2,'0')} ${ampm}${dayOffset>0 ? ' (+1d)':''}`;
+}
+
+function getActuals(){
+  try{ return JSON.parse(localStorage.getItem('v2rActualTimes')||'{}'); } catch(e){ return {}; }
+}
+function setActual(key, hhmm){
+  const a = getActuals();
+  if(hhmm) a[key]=hhmm; else delete a[key];
+  localStorage.setItem('v2rActualTimes', JSON.stringify(a));
+}
+function resetEtaActuals(){
+  if(confirm('Clear all actual arrival times?')){
+    localStorage.removeItem('v2rActualTimes');
+    renderEta();
+  }
+}
+
+function computeEta(){
+  const actuals = getActuals();
+  // precompute plan absolute minutes (monotonic, handles midnight rollover)
+  let planAbs = [];
+  let prevPlan = null;
+  ETA_POINTS.forEach((p,i)=>{
+    let raw = parseClockToMinutes(p.plan);
+    let abs = prevPlan===null ? raw : rollForward(raw, prevPlan);
+    planAbs.push(abs);
+    prevPlan = abs;
+  });
+
+  let anchorAbs = null, anchorMi = 0, pace = null, anchorIdx = -1;
+  const rows = ETA_POINTS.map((p,i)=>{
+    const actualStr = actuals[p.key] || '';
+    let liveAbs, isActual=false, legPace=null;
+
+    if(i===0){
+      if(actualStr){ liveAbs = parseTimeInputToMinutes(actualStr); isActual=true; }
+      else liveAbs = planAbs[0];
+      anchorAbs = liveAbs; anchorMi = p.mi; anchorIdx = 0;
+    } else {
+      const distFromAnchor = p.mi - anchorMi;
+      if(actualStr){
+        let raw = parseTimeInputToMinutes(actualStr);
+        liveAbs = rollForward(raw, anchorAbs);
+        isActual = true;
+        const hrs = (liveAbs - anchorAbs)/60;
+        legPace = hrs>0 ? (distFromAnchor/hrs) : null;
+        anchorAbs = liveAbs; anchorMi = p.mi; pace = legPace; anchorIdx = i;
+      } else {
+        if(pace){
+          liveAbs = anchorAbs + (distFromAnchor/pace)*60;
+        } else {
+          // no actual pace established yet — carry forward plan's offset from the anchor point
+          liveAbs = anchorAbs + (planAbs[i] - planAbs[anchorIdx]);
+        }
+      }
+    }
+    return { p, isActual, liveAbs, legPace };
+  });
+  return { rows, finalPace: pace };
+}
+
+function renderEta(){
+  const { rows, finalPace } = computeEta();
+  const table = document.getElementById('etaTable');
+  table.innerHTML = '<tr><th>Pit</th><th>RM</th><th>Sec. mi</th><th>Plan ETA</th><th>Actual</th><th>Live ETA</th></tr>' +
+    rows.map((r,i)=>{
+      const p = r.p;
+      const prevMi = i===0 ? 0 : rows[i-1].p.mi;
+      const secMi = i===0 ? '—' : (p.mi - prevMi);
+      const flagHtml = p.flag ? ` <span class="pill unconfirmed">${p.flag}</span>` : '';
+      const liveStr = formatAbsMinutes(r.liveAbs);
+      const liveCellStyle = r.isActual ? 'font-weight:800; color:#146c2e;' : '';
+      return `<tr>
+        <td>${p.label}${flagHtml}</td>
+        <td>${p.mi}</td>
+        <td>${secMi}</td>
+        <td>${p.plan}</td>
+        <td><input type="time" value="${localStorage.getItem('v2rActualTimes') ? (JSON.parse(localStorage.getItem('v2rActualTimes'))[p.key]||'') : ''}" style="width:110px; padding:4px;" onchange="setActual('${p.key}', this.value); renderEta();"></td>
+        <td style="${liveCellStyle}">${liveStr}${r.isActual?' ✓':''}</td>
+      </tr>`;
+    }).join('');
+
+  document.getElementById('statStart').textContent = formatAbsMinutes(rows[0].liveAbs).split(' ')[0];
+  document.getElementById('statFinish').textContent = formatAbsMinutes(rows[rows.length-1].liveAbs).split(' ')[0];
+  document.getElementById('statPace').textContent = finalPace ? Math.round(finalPace)+' mph' : '—';
+}
+renderEta();
+</script>
 
 <section id="log">
   <h2>Manual Pace / Timing Log</h2>

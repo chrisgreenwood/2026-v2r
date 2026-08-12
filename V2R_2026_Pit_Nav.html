@@ -143,6 +143,12 @@
     </div>
 
     <div class="flagnote" id="flagBox" style="display:none;" id="flagBoxText"></div>
+
+    <div class="turnnote" style="border-left-color:#1e5fff;">
+      <div class="lab" style="color:#1e5fff;">Actual arrival at destination</div>
+      <input type="time" id="actualInput" style="width:100%; padding:10px; border-radius:8px; border:1px solid #2a3650; background:#0b1220; color:#fff; font-size:1rem;" onchange="saveActual(this.value)">
+      <div id="liveEtaDisplay" style="margin-top:8px; font-size:0.85rem; color:#9fb3d9;"></div>
+    </div>
   </div>
 
   <div class="navrow">
@@ -220,6 +226,10 @@
 <div class="footer-note">V2R 2026 · Chase road routing (LeadNav GPX) + #888 ETA chart · Aug 12, 2026</div>
 
 <script>
+const DEST_KEYS = ['start','p1','p2','p3','p4','p5','p6','p7','p8','p9','p10','p11','finish'];
+const DEST_MI   = [0,45,75,110,135,175,230,285,345,390,430,477,502];
+const DEST_PLAN = ['12:30 PM','1:32 PM','2:10 PM','2:58 PM','3:31 PM','4:25 PM','5:28 PM','6:34 PM','7:42 PM','8:40 PM','9:28 PM','10:38 PM','11:05 PM'];
+
 const legs = [
   { from:"J Resort", to:"Start (Dayton, NV)", dist:"42.8", eta:"12:15 PM",
     saddr:"39.5282,-119.81861", daddr:"39.22924,-119.57766",
@@ -266,6 +276,76 @@ const legs = [
 let idx = parseInt(localStorage.getItem('v2rPitNavLeg') || '0', 10);
 if (isNaN(idx) || idx < 0 || idx >= legs.length) idx = 0;
 
+function parseClockToMinutes(str){
+  const m = str.trim().match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if(!m) return null;
+  let h = parseInt(m[1],10) % 12;
+  if(/PM/i.test(m[3])) h += 12;
+  return h*60 + parseInt(m[2],10);
+}
+function parseTimeInputToMinutes(hhmm){
+  const [h,m] = hhmm.split(':').map(Number);
+  return h*60+m;
+}
+function rollForward(mins, floor){
+  let v = mins;
+  while(v < floor) v += 1440;
+  return v;
+}
+function formatAbsMinutes(abs){
+  abs = Math.round(abs);
+  const dayOffset = Math.floor(abs/1440);
+  const m = ((abs%1440)+1440)%1440;
+  let h = Math.floor(m/60), mm = m%60;
+  const ampm = h>=12 ? 'PM':'AM';
+  let h12 = h%12; if(h12===0) h12=12;
+  return `${h12}:${String(mm).padStart(2,'0')} ${ampm}${dayOffset>0 ? ' (+1d)':''}`;
+}
+function getActuals(){
+  try{ return JSON.parse(localStorage.getItem('v2rActualTimes')||'{}'); } catch(e){ return {}; }
+}
+function saveActual(val){
+  const key = DEST_KEYS[idx];
+  const a = getActuals();
+  if(val) a[key]=val; else delete a[key];
+  localStorage.setItem('v2rActualTimes', JSON.stringify(a));
+  render();
+}
+function computeLiveEta(){
+  const actuals = getActuals();
+  let planAbs = [], prevPlan = null;
+  DEST_PLAN.forEach((t)=>{
+    let raw = parseClockToMinutes(t);
+    let abs = prevPlan===null ? raw : rollForward(raw, prevPlan);
+    planAbs.push(abs); prevPlan = abs;
+  });
+  let anchorAbs=null, anchorMi=0, pace=null, anchorIdx=-1;
+  const results = DEST_KEYS.map((key,i)=>{
+    const actualStr = actuals[key] || '';
+    let liveAbs, isActual=false;
+    if(i===0){
+      liveAbs = actualStr ? parseTimeInputToMinutes(actualStr) : planAbs[0];
+      isActual = !!actualStr;
+      anchorAbs = liveAbs; anchorMi = DEST_MI[0]; anchorIdx = 0;
+    } else {
+      const distFromAnchor = DEST_MI[i] - anchorMi;
+      if(actualStr){
+        let raw = parseTimeInputToMinutes(actualStr);
+        liveAbs = rollForward(raw, anchorAbs);
+        isActual = true;
+        const hrs = (liveAbs-anchorAbs)/60;
+        pace = hrs>0 ? (distFromAnchor/hrs) : pace;
+        anchorAbs = liveAbs; anchorMi = DEST_MI[i]; anchorIdx = i;
+      } else {
+        liveAbs = pace ? (anchorAbs + (distFromAnchor/pace)*60)
+                       : (anchorAbs + (planAbs[i]-planAbs[anchorIdx]));
+      }
+    }
+    return { key, liveAbs, isActual };
+  });
+  return { results, pace };
+}
+
 function render(){
   const leg = legs[idx];
   document.getElementById('progressLabel').textContent = `Leg ${idx+1} of ${legs.length}`;
@@ -283,6 +363,21 @@ function render(){
   const flagBox = document.getElementById('flagBox');
   if (leg.flag) { flagBox.style.display='block'; flagBox.textContent = leg.flag; }
   else { flagBox.style.display='none'; }
+
+  const actuals = getActuals();
+  const destKey = DEST_KEYS[idx];
+  document.getElementById('actualInput').value = actuals[destKey] || '';
+
+  const { results, pace } = computeLiveEta();
+  const thisResult = results[idx];
+  const liveDisp = document.getElementById('liveEtaDisplay');
+  if (thisResult.isActual) {
+    liveDisp.innerHTML = `✅ Arrived ${formatAbsMinutes(thisResult.liveAbs)}`;
+  } else if (pace) {
+    liveDisp.innerHTML = `Live ETA ${formatAbsMinutes(thisResult.liveAbs)} <span style="color:#8a94a6;">(running ${Math.round(pace)} mph)</span>`;
+  } else {
+    liveDisp.innerHTML = `Live ETA ${formatAbsMinutes(thisResult.liveAbs)} <span style="color:#8a94a6;">(no actuals yet — plan pace)</span>`;
+  }
 
   document.getElementById('prevBtn').disabled = (idx === 0);
   document.getElementById('nextBtn').disabled = (idx === legs.length - 1);
