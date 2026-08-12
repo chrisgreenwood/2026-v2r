@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>V2R Pit Nav — #888 Chase</title>
+<style>
+  :root{ color-scheme: dark; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html,body {
+    margin:0; padding:0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background:#000; color:#f2f3f5;
+    -webkit-text-size-adjust: 100%;
+  }
+  header {
+    background:#0b1a33; padding:10px 14px; display:flex; align-items:center;
+    justify-content:space-between; position:sticky; top:0; z-index:20;
+    border-bottom:1px solid #1c3260;
+  }
+  header .title { font-size:0.95rem; font-weight:700; color:#fff; }
+  header a.back {
+    color:#9fb3d9; text-decoration:none; font-size:0.8rem; padding:6px 10px;
+    background:#132446; border-radius:8px;
+  }
+  main { padding:14px 14px 40px; max-width:640px; margin:0 auto; }
+
+  .safety {
+    background:#3a1a1a; border:1px solid #8a2e2e; color:#ffb3b3;
+    border-radius:10px; padding:10px 12px; font-size:0.8rem; margin-bottom:14px;
+    text-align:center; font-weight:600;
+  }
+
+  .progress {
+    text-align:center; font-size:0.78rem; color:#8a94a6; margin-bottom:10px;
+    letter-spacing:.04em; text-transform:uppercase;
+  }
+
+  .legcard {
+    background:#101826; border:1px solid #232f45; border-radius:18px;
+    padding:20px 18px; margin-bottom:12px;
+  }
+  .legcard .fromto {
+    font-size:0.78rem; color:#8a94a6; text-transform:uppercase; letter-spacing:.04em;
+    margin-bottom:2px;
+  }
+  .legcard h2 {
+    font-size:1.7rem; margin:0 0 10px; color:#fff; line-height:1.15;
+  }
+  .biggrid { display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:14px; }
+  .bignum { background:#1a2436; border-radius:12px; padding:10px 12px; text-align:center; }
+  .bignum .val { font-size:1.5rem; font-weight:800; color:#fff; }
+  .bignum .lab { font-size:0.68rem; color:#8a94a6; text-transform:uppercase; letter-spacing:.04em; margin-top:2px; }
+
+  a.gobtn {
+    display:block; text-align:center; background:#1e5fff; color:#fff;
+    text-decoration:none; font-size:1.15rem; font-weight:800; padding:18px;
+    border-radius:14px; margin-bottom:10px;
+  }
+  a.gobtn:active { background:#144acb; }
+  a.gobtn.secondary { background:#1a2436; color:#9fb3d9; font-size:0.95rem; font-weight:700; padding:14px; }
+
+  .turnnote {
+    background:#1a2436; border-left:4px solid #ffb020; border-radius:8px;
+    padding:10px 12px; font-size:0.95rem; line-height:1.4; margin-bottom:10px;
+  }
+  .turnnote .lab { font-size:0.68rem; color:#ffb020; text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px; font-weight:700; }
+
+  .flagnote {
+    background:#3a2a10; border-left:4px solid #ffb020; border-radius:8px;
+    padding:10px 12px; font-size:0.88rem; margin-bottom:10px; color:#ffd699;
+  }
+
+  .navrow { display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin:16px 0; }
+  .navrow button {
+    background:#1a2436; color:#fff; border:1px solid #2a3650; border-radius:12px;
+    padding:16px; font-size:1rem; font-weight:700;
+  }
+  .navrow button:disabled { opacity:0.35; }
+
+  details { margin-top:18px; }
+  details summary {
+    cursor:pointer; font-weight:700; padding:10px 0; font-size:0.9rem; color:#9fb3d9;
+  }
+  .jumplist { display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+  .jumplist button {
+    text-align:left; background:#101826; border:1px solid #232f45; color:#e6e9ef;
+    border-radius:10px; padding:12px 14px; font-size:0.88rem;
+  }
+  .jumplist button.active { border-color:#1e5fff; background:#12203e; }
+
+  .contacts { margin-top:18px; }
+  .contacts h3 { font-size:0.8rem; text-transform:uppercase; letter-spacing:.04em; color:#8a94a6; margin:0 0 8px; }
+  .contactrow {
+    display:flex; justify-content:space-between; align-items:center;
+    background:#101826; border:1px solid #232f45; border-radius:10px;
+    padding:12px 14px; margin-bottom:6px;
+  }
+  .contactrow .name { font-size:0.92rem; font-weight:600; }
+  .contactrow .role { font-size:0.72rem; color:#8a94a6; }
+  a.tel {
+    color:#1e5fff; background:#1a2436; text-decoration:none; font-weight:700;
+    font-size:0.85rem; padding:8px 12px; border-radius:8px; white-space:nowrap;
+  }
+
+  .closingcard {
+    background:#101826; border:1px solid #232f45; border-radius:14px;
+    padding:14px 16px; margin-top:18px;
+  }
+  .closingcard h3 { font-size:0.8rem; text-transform:uppercase; letter-spacing:.04em; color:#8a94a6; margin:0 0 8px; }
+  table { width:100%; border-collapse:collapse; font-size:0.82rem; }
+  th, td { text-align:left; padding:6px 4px; border-bottom:1px solid #1c2536; }
+  th { color:#8a94a6; font-size:0.68rem; text-transform:uppercase; }
+  .footer-note { text-align:center; color:#555; font-size:0.68rem; padding:24px 12px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="title">🚗 Pit Nav — #888 Chase</span>
+  <a class="back" href="V2R_2026_Race_Reference.html">Full Reference →</a>
+</header>
+
+<main>
+
+  <div class="progress" id="progressLabel">Leg — of —</div>
+
+  <div class="legcard">
+    <div class="fromto" id="fromLabel">From</div>
+    <h2 id="toLabel">To</h2>
+
+    <div class="biggrid">
+      <div class="bignum"><div class="val" id="distVal">—</div><div class="lab">Miles</div></div>
+      <div class="bignum"><div class="val" id="etaVal">—</div><div class="lab">Target ETA</div></div>
+    </div>
+
+    <a class="gobtn" id="mapsBtn" href="#" target="_blank">📍 Navigate in Google Maps</a>
+    <a class="gobtn secondary" id="destBtn" href="#" target="_blank">Drop pin at destination only</a>
+
+    <div class="turnnote" id="turnNoteBox" style="display:none;">
+      <div class="lab">Approach note</div>
+      <div id="turnNoteText"></div>
+    </div>
+
+    <div class="flagnote" id="flagBox" style="display:none;" id="flagBoxText"></div>
+  </div>
+
+  <div class="navrow">
+    <button id="prevBtn" onclick="goPrev()">← Prev leg</button>
+    <button id="nextBtn" onclick="goNext()">Next leg →</button>
+  </div>
+
+  <details>
+    <summary>Jump to any leg</summary>
+    <div class="jumplist" id="jumpList"></div>
+  </details>
+
+  <div class="contacts">
+    <h3>Quick Call — Chase &amp; Fuel</h3>
+    <div class="contactrow">
+      <div><div class="name">Brad Lovell</div><div class="role">Driver</div></div>
+      <a class="tel" href="tel:7196497494">Call</a>
+    </div>
+    <div class="contactrow">
+      <div><div class="name">Adam Lovell</div><div class="role">Nav</div></div>
+      <a class="tel" href="tel:7196492748">Call</a>
+    </div>
+    <div class="contactrow">
+      <div><div class="name">Dan Huseman</div><div class="role">Lovell Chase 1</div></div>
+      <a class="tel" href="tel:9512830048">Call</a>
+    </div>
+    <div class="contactrow">
+      <div><div class="name">Robbie Huseman</div><div class="role">Lovell Chase 1</div></div>
+      <a class="tel" href="tel:9518409464">Call</a>
+    </div>
+    <div class="contactrow">
+      <div><div class="name">Randall Huseman</div><div class="role">Fuel Chase 2</div></div>
+      <a class="tel" href="tel:9519015932">Call</a>
+    </div>
+    <div class="contactrow">
+      <div><div class="name">Jason Hutter</div><div class="role">Fuel Chase 2</div></div>
+      <a class="tel" href="tel:9702740469">Call</a>
+    </div>
+    <div class="contactrow">
+      <div><div class="name">Paul Blangsted</div><div class="role">Fuel Chase 2</div></div>
+      <a class="tel" href="tel:9702740304">Call</a>
+    </div>
+    <div class="contactrow">
+      <div><div class="name">Kevin Huseman</div><div class="role">Raptor Light Chase</div></div>
+      <a class="tel" href="tel:9512837272">Call</a>
+    </div>
+    <div class="contactrow">
+      <div><div class="name">Jon Clark</div><div class="role">F150 Raptor data</div></div>
+      <a class="tel" href="tel:9133143810">Call</a>
+    </div>
+  </div>
+
+  <div class="closingcard">
+    <h3>Pit Closing Times (Car/Truck/UTV — Fri 8/14)</h3>
+    <table>
+      <tr><th>Pit</th><th>Closes</th></tr>
+      <tr><td>1 Weeks</td><td>2:51 PM</td></tr>
+      <tr><td>2 Top Gun</td><td>3:46 PM</td></tr>
+      <tr><td>3 Rawhide</td><td>4:53 PM</td></tr>
+      <tr><td>4 Gabbs</td><td>5:41 PM</td></tr>
+      <tr><td>5 Mina</td><td>7:01 PM</td></tr>
+      <tr><td>6 Coaldale</td><td>8:40 PM</td></tr>
+      <tr><td>7 Tonopah</td><td>10:26 PM</td></tr>
+      <tr><td>8 Cottontail</td><td>12:14 AM</td></tr>
+      <tr><td>9 Bonnie Claire</td><td>1:36 AM</td></tr>
+      <tr><td>10 Omni Station</td><td>2:57 AM</td></tr>
+      <tr><td>11 Amargosa Valley</td><td>4:24 AM</td></tr>
+      <tr><td><strong>Finish Crystal</strong></td><td><strong>5:12 AM</strong></td></tr>
+    </table>
+    <p style="font-size:0.72rem; color:#8a94a6; margin-top:8px;">Pit crew speed limit: 25 MPH entering/inside/exiting every pit. No overnight camping. Move-out immediately after race.</p>
+  </div>
+
+</main>
+
+<div class="footer-note">V2R 2026 · Chase road routing (LeadNav GPX) + #888 ETA chart · Aug 12, 2026</div>
+
+<script>
+const legs = [
+  { from:"J Resort", to:"Start (Dayton, NV)", dist:"42.8", eta:"12:15 PM",
+    saddr:"39.5282,-119.81861", daddr:"39.22924,-119.57766",
+    note:"Leave start line ~15 min before race car. Get fuel leaving Reno." },
+  { from:"Start (Dayton, NV)", to:"Pit 1 – Weeks", dist:"31.0", eta:"12:49 PM",
+    saddr:"39.22924,-119.57766", daddr:"39.28237,-119.23054",
+    note:"Pit 1 Weeks is just south of Carson River near \u2018Scout Camp at Fort Churchill\u2019." },
+  { from:"Pit 1 – Weeks", to:"Pit 2 – Top Gun", dist:"51.5", eta:"2:09 PM",
+    saddr:"39.28237,-119.23054", daddr:"39.25993,-118.76369",
+    note:"Pit 2 Top Gun is near \u2018Top Gun Raceway\u2019." },
+  { from:"Pit 2 – Top Gun", to:"Pit 3 – Rawhide", dist:"60.4", eta:"2:58 PM",
+    saddr:"39.25993,-118.76369", daddr:"38.96932,-118.34411",
+    note:"1 hr from 95 / Alt 95 junction (38.968917, -118.343878).",
+    flag:"⚠️ No scheduled support at Pit 3 Rawhide — emergency only." },
+  { from:"Pit 3 – Rawhide", to:"Pit 4 – Gabbs", dist:"69.2", eta:"3:31 PM",
+    saddr:"38.96932,-118.34411", daddr:"38.8703,-117.92299",
+    note:"Pit 4 Gabbs is a town." },
+  { from:"Pit 4 – Gabbs", to:"Pit 5 – Mina", dist:"42.4", eta:"4:25 PM",
+    saddr:"38.8703,-117.92299", daddr:"38.42102,-118.08792",
+    note:"Turn NE on Simon Lead Rd just before the town of Mina." },
+  { from:"Pit 5 – Mina", to:"Pit 6 – Coaldale", dist:"32.6", eta:"5:28 PM",
+    saddr:"38.42102,-118.08792", daddr:"38.03006,-117.89209",
+    note:"Turn west on Hwy 6 at Coaldale Junction. ~0.5 mi off the highway." },
+  { from:"Pit 6 – Coaldale", to:"Pit 7 – Tonopah", dist:"45.2", eta:"6:34 PM",
+    saddr:"38.03006,-117.89209", daddr:"38.02655,-117.25727",
+    note:"Turn west on dirt road 2.4 mi past the Texaco station. Follow dirt road 1 mi." },
+  { from:"Pit 7 – Tonopah", to:"Pit 8 – Cottontail", dist:"39.6", eta:"7:42 PM",
+    saddr:"38.0264,-117.25716", daddr:"37.49879,-117.1844",
+    note:"At Hwy 95 / 266 junction, west side of highway. Hard to miss." },
+  { from:"Pit 8 – Cottontail", to:"Pit 9 – Bonnie Claire", dist:"23.1", eta:"8:40 PM",
+    saddr:"37.49879,-117.1844", daddr:"37.22625,-117.12766",
+    note:"Search for \u2018Bonnie Claire\u2019 turn on Scotty\u2019s Castle Rd off Hwy 95." },
+  { from:"Pit 9 – Bonnie Claire", to:"Pit 10 – Omni Station", dist:"50.7", eta:"9:28 PM",
+    saddr:"37.22625,-117.12766", daddr:"36.80416,-116.74784",
+    note:"~5 mi south of Beatty. 0.5 mi off west side of highway on dirt road, visible from Hwy 95." },
+  { from:"Pit 10 – Omni Station", to:"Pit 11 – Amargosa Valley", dist:"24.0", eta:"10:38 PM",
+    saddr:"36.80416,-116.74784", daddr:"36.63432,-116.41311",
+    note:"Small town at Hwy 373 junction. Pit is ~0.5 mi off highway, NW corner." },
+  { from:"Pit 11 – Amargosa Valley", to:"Finish (Crystal, NV)", dist:"26.3", eta:"11:05 PM",
+    saddr:"36.63432,-116.41311", daddr:"36.49083,-116.15524",
+    note:"From Hwy 95, turn right on Hwy 160, then right again in ~5 mi." },
+];
+
+let idx = parseInt(localStorage.getItem('v2rPitNavLeg') || '0', 10);
+if (isNaN(idx) || idx < 0 || idx >= legs.length) idx = 0;
+
+function render(){
+  const leg = legs[idx];
+  document.getElementById('progressLabel').textContent = `Leg ${idx+1} of ${legs.length}`;
+  document.getElementById('fromLabel').textContent = `From ${leg.from}`;
+  document.getElementById('toLabel').textContent = leg.to;
+  document.getElementById('distVal').textContent = leg.dist;
+  document.getElementById('etaVal').textContent = leg.eta;
+  document.getElementById('mapsBtn').href = `https://www.google.com/maps/dir/?api=1&origin=${leg.saddr}&destination=${leg.daddr}&travelmode=driving`;
+  document.getElementById('destBtn').href = `https://www.google.com/maps/search/?api=1&query=${leg.daddr}`;
+
+  const noteBox = document.getElementById('turnNoteBox');
+  if (leg.note) { noteBox.style.display='block'; document.getElementById('turnNoteText').textContent = leg.note; }
+  else { noteBox.style.display='none'; }
+
+  const flagBox = document.getElementById('flagBox');
+  if (leg.flag) { flagBox.style.display='block'; flagBox.textContent = leg.flag; }
+  else { flagBox.style.display='none'; }
+
+  document.getElementById('prevBtn').disabled = (idx === 0);
+  document.getElementById('nextBtn').disabled = (idx === legs.length - 1);
+
+  const jl = document.getElementById('jumpList');
+  jl.innerHTML = legs.map((l,i)=>
+    `<button class="${i===idx?'active':''}" onclick="jumpTo(${i})">${i+1}. ${l.from} → ${l.to} <span style="color:#8a94a6;">(${l.dist} mi, ETA ${l.eta})</span></button>`
+  ).join('');
+
+  localStorage.setItem('v2rPitNavLeg', idx);
+}
+function goPrev(){ if(idx>0){ idx--; render(); } }
+function goNext(){ if(idx<legs.length-1){ idx++; render(); } }
+function jumpTo(i){ idx=i; render(); }
+render();
+</script>
+
+</body>
+</html>
