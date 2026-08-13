@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>V2R 2026 — Lovell #888</title>
@@ -12,18 +13,28 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background:#0b1a33; color:#fff; padding:20px;
   }
-  main { max-width:420px; width:100%; }
+  main { max-width:440px; width:100%; }
   h1 { font-size:1.3rem; margin:0 0 4px; }
-  .sub { font-size:0.85rem; color:#9fb3d9; margin-bottom:24px; }
-  a.card {
-    display:block; background:#132446; border:1px solid #1c3260; border-radius:14px;
-    padding:18px 16px; margin-bottom:12px; text-decoration:none; color:#fff;
+  .sub { font-size:0.85rem; color:#9fb3d9; margin-bottom:20px; }
+  .group-label {
+    font-size:0.7rem; text-transform:uppercase; letter-spacing:.05em; color:#7288ad;
+    margin:18px 0 8px; font-weight:700;
   }
-  a.card .name { font-size:1.05rem; font-weight:700; margin-bottom:4px; }
-  a.card .desc { font-size:0.8rem; color:#9fb3d9; }
-  a.card.pitnav { background:#1e5fff; border-color:#1e5fff; }
-  a.card.pitnav .desc { color:#cfe0ff; }
+  a.card {
+    display:block; border-radius:14px;
+    padding:16px 16px; margin-bottom:10px; text-decoration:none; color:#fff;
+  }
+  a.card .name { font-size:1.0rem; font-weight:700; margin-bottom:3px; }
+  a.card .desc { font-size:0.78rem; opacity:0.85; }
+  a.card.ref { background:#132446; border:1px solid #1c3260; }
+  a.card.pitnav { background:#1e5fff; }
+  a.card.pace888 { background:#1e5fff; border:1px solid #1c3260; }
+  a.card.rr228 { background:#ff5a1f; color:#161311; }
+  a.card.rr228 .desc { color:#3a2a1f; }
+  a.card.r773 { background:#2f8f52; }
+  a.card.b4600 { background:#d6249f; }
 </style>
+
 
 <style>
   #v2rGate {
@@ -64,9 +75,9 @@
 <div id="v2rContent"></div>
 
 <script>
-const V2R_SALT = "FORKmWrBCJtQv9Cz5O80Dg==";
-const V2R_IV = "0uis0581zYZ0sKSw";
-const V2R_CT = "5+1x2oRhKnr/LmGJadmOvovXaWbn9nlEziTldGFYBxvRLITX2NJifapw3ibcDhn8/XZXyWVQCbleAEAqy0RyImUkwLKRmgQE4IImOleTqc5gHyplyeW8T1p1iF87mfcvDKXlg9sRj/JQruy43jCLdRXlFgiGvYaADZCIaroNWBe9cSLJ0OI1RYKvoHn9HJoCnCHklWGGtFiFkdbSi3r5WJh+Cow+dp1GOy7Ejao6W0HcREei1/sgWyRL9WMOPeM0ctNiItNzkGpkoQI0qgMjlc0RRUn/3gV0HK8WZuEVAOL6xVoiyCorBNe5puyen2pEVVMTl46/I7BhrgVruOV3gd0frD3FJ2OjjyaUOAz9PPsLJetk64tO0lhAPBCBwrBqs+Rne91FAEn0hdKlylRaqblanFGlXPhZC+NPWh3wpHcINF/vuoI0VsncdOkMIm9hGgGUT/SwlBu9ele20HdOZH4rfWP7EFQtM3UL544EfCYpgb519XgUdqFrukQyPvfk7rLltkf242J5yjz+9rGiGx0pjHu6arrQrJG5AtiGT2nUmkg0B1zp00719k5TwxBIUzH/+arnLjuzikFoSrwNzHGwtQp7idUlOEQOZUfnilTeFk9UoP/oegUhNAXhlsjKwIzscrR0HsvQY1MeXrS+0oUHvt7PJBQtsTqdfv5XFh2Hhbyk8Cdza03J53AgWYp4aNKsZFeA9lW2afvga32L0cf6gIu+uE8q2LdP3g==";
+const V2R_SALT = "jqdpTCGfupGkdJWIfGOm3g==";
+const V2R_IV = "ZgQzMyQ1Iu62pDCv";
+const V2R_CT = "9FCsH9UFL3LSD7BWPgVd6eDo3h9QtBHcVQtZjnFpovfjm81hWlEb/efZHic7sHiiqQzZqG6g8MTMyBuELJxKkZbEVbDi19iBSc1/YiEuUP4dFkRKffU0c6AWmr5OepIDqujcxyakLwOj1wOnx8TAyQSFUxTd61kIF5zhv/qrVewp87S0Ecl11dSSAqOpt2OvdQCZ4djOkQzYBQOnY+kZNRAIdNA+cUmjBP3FFfMC7UN5LbJK1ycl1gXmreEz2M6m49tYCPCnh3ZN6HEv2PKrGgMyVESrzCohFrI6fFBRyLjIOm+UhlsXhTS35UV56e/LhBTm6hE1FG54q7MZz4pDxvPy235lp1aA4BkgCqMp3iHFbctZEAnGcS81psfIAoN2DqA6QjZbuvGLmLNZsO2lPpIGlqk+x27ICRtT7RgZseex31O+rgLWlQF646yjSQA8oXS/ETfHTm3rsyrL0pECh5weQa2myhBXVW8+SyZmR598buRYam8UgZQePEUo5WxGGT5uX86fiz5hdvdGjep9svsLKlKezwgj9Z100P/Xqcauh5mMmPubfvIVYKS6DsiZJsAwoZyo4ahWryF7gkusB0SGxVi2PG4XaJGqtUQrV9ffjOz3ts/bdqodjcu8od01+yyVEuQrTAoPfsohgkb8wvNwkVofHvgBAGhj76tc1EHAFcNnjGFbYFCDQewafDoHlcNgDl0itoJFnTyhkZ7O34hQ6AdrfILTagZMnNUmzM7aMBNU/xfhKbqTMONJY7uXA6XKxOpD5iepSfM4LGqbVUdD29iuVfEJgIlQACFyBi3TaA+7QXj9LfazhBezeL7YpbczzTWSVzlE0g7dPZ4Nu1vQPMsLspBYMs4316oVsg0IVmBF0/i27RHUolCrYMIX4rWaPvkQYKECBP1rRVAorkuTh7Ha9v0qVthSH6woCCy6QHZ4Nnwjkjd47WDzktnc8pxgt+dkL/qEunlARtnDnxCQtFcygyCTiZM7h91ncSd1D7sluG+cbWfkYptAU0YCAcKeuzsQZIvB/HNbsgJIOsU5YoIJnbDf90a3l4QGh/qQb+42pYLNhKaBNTXsnGyZG55R73b/bzvLl4W/vICAWDseRmiaEniHCbfegLZUzK1g9wVbfJnP1eBJolsJp99fetX3vBEaIIhryfTmuzgiXanQvsfTtrfr7qEvwekOL3VJHNm9oiAswsmNjnrGA5+PjBwtbH0nxPj2dHbKGKnT5yrMC8rN7hOvz32weBXlOtjP/QuBK6g3VekdDAq96o8ZAoZjtj82Dc2gUEzF2xSh3o4p3pJdzQW35XcnGkszdcjVojUtPkkrhUESeD9v6oG+h1YHWAE5ekZ7yenhA43PCEtM565zoirjUvN8URQsmGRL87OCIg+rnovt0YNTtKchMPiopf/iDhuG1JWOG+9C2SJCUWZjaolTXGfnujH2IWB1BZaG+neZToT428RlkcMz6V8GaUFXHLRhhVrN2iWpm7tGP30MWXtk7e0TwWTDbVHbAsIU2Sq0El7ZSc/ecQ8j8tBiH22xURcHeZMWhqFN0Nrnh4nADi4yz8PD5LyMEB4WSaASHaiHcUYa577TjePZxzB+5Ov3ReghfheE/MNOTeis3tKqv6ni9qKQSCzDlvj7Bl1V5ong61QxYLYM15kyansK3xN+Y0OtZ/ELbEJrVQz6gIhZ4d1GG4db6kfE4CavlCpsKHLdIiCWQ7214NoZu+2ba6t//N5c4e2ZVyBZdmGEpYBczKHxzUYVWCM+4GBXlkg/nRvehx9nQcioVeIbyuXc5/oh0mpGcjK39q6JDW9o/Ean8TG3cdvk/moo8g0cmPgwW/s=";
 const V2R_STORAGE_KEY = "v2rSitePassword";
 
 function b64ToBytes(b64) {
